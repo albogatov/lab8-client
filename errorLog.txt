@@ -1,0 +1,7 @@
+java.nio.channels.UnresolvedAddressException
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:149)
+	at java.base/sun.nio.ch.Net.checkAddress(Net.java:157)
+	at java.base/sun.nio.ch.DatagramChannelImpl.connect(DatagramChannelImpl.java:1212)
+	at java.base/sun.nio.ch.DatagramChannelImpl.connect(DatagramChannelImpl.java:1202)
+	at client.Client.connect(Client.java:95)
+	at client.Client.main(Client.java:56)
