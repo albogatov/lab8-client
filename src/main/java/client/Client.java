@@ -42,25 +42,26 @@ public class Client implements Runnable {
         UserInterface userInterface = new UserInterface(new InputStreamReader(System.in),
                 new OutputStreamWriter(System.out), true);
         try {
-            String host = userInterface.readUnlimitedArgument("Введите адрес подключения:", false);
-            Integer port = null;
-            while (port == null) {
-                try {
-                    port = Integer.parseInt(userInterface.readLimitedArgument("Введите порт:", 1025, 65535, false));
-                } catch (NumberFormatException e) {
-                    userInterface.displayMessage("Порт должен быть числом");
-                }
-            }
+//            String host = userInterface.readUnlimitedArgument("Введите адрес подключения:", false);
+            String host = "localhost";
+            Integer port = 7855;
+//            while (port == null) {
+//                try {
+//                    port = Integer.parseInt(userInterface.readLimitedArgument("Введите порт:", 1025, 65535, false));
+//                } catch (NumberFormatException e) {
+//                    userInterface.displayMessage("Порт должен быть числом");
+//                }
+//            }
             Client client = new Client();
             client.connect(host, port);
-            boolean entrance = false;
-            try {
-                while (!entrance)
-                    entrance = client.authorisation();
-            } catch (PortUnreachableException e) {
-                userInterface.displayMessage("Указан неверный адрес соединения, невозможно завершить авторизацию");
-                System.exit(-1);
-            }
+//            boolean entrance = false;
+//            try {
+//                while (!entrance)
+//                    entrance = client.authorisation();
+//            } catch (PortUnreachableException e) {
+//                userInterface.displayMessage("Указан неверный адрес соединения, невозможно завершить авторизацию");
+//                System.exit(-1);
+//            }
             client.run();
             while (true) {
                 String confirmation = userInterface.readUnlimitedArgument("Сервер временно недоступен, хотите повторить подключение? (да/нет)", false);
@@ -90,10 +91,11 @@ public class Client implements Runnable {
         }
     }
 
-    public void connect(String host, int port) throws IOException {
+    public boolean connect(String host, int port) throws IOException {
         socketAddress = new InetSocketAddress(host, port);
         datagramChannel.connect(socketAddress);
         userInterface.displayMessage("Осуществляется подключение по адресу " + host + " по порту " + port);
+        return true;
     }
 
     public void sendCommand(Command cmd) throws IOException {
@@ -195,25 +197,24 @@ public class Client implements Runnable {
         }
     }
 
-    public boolean authorisation() throws IOException {
-        String action = userInterface.readUnlimitedArgument("Здравствуйте! Введите login, если вы уже зарегистрированы. В ином случае, введите register.", false);
-        if (action.equals("login")) {
-            return login();
-        } else {
-            if (action.equals("register")) {
-                return register();
-            } else return false;
-        }
-    }
+//    public boolean authorisation(String action, String login, String pwd) throws IOException {
+////        String action = userInterface.readUnlimitedArgument("Здравствуйте! Введите login, если вы уже зарегистрированы. В ином случае, введите register.", false);
+//        if (action.equals("login")) {
+//            return login();
+//        } else {
+//            if (action.equals("register")) {
+//                return register();
+//            } else return false;
+//        }
+//    }
 
-    public boolean login() throws IOException {
+    public boolean login(String login, String pwd) throws IOException {
         Set keys = selector.selectedKeys();
         keys.clear();
         datagramChannel.register(selector, SelectionKey.OP_WRITE);
-        String login = userInterface.readUnlimitedArgument("Введите ваш логин:", false);
-        String password = getHexString(userInterface.readUnlimitedArgument("Введите пароль", false));
+        pwd = getHexString(pwd);
         Command cmd = new Login();
-        User user = new User(login, password);
+        User user = new User(login, pwd);
         cmd.setUser(user);
         sendCommand(cmd);
         datagramChannel.register(selector, SelectionKey.OP_READ);
@@ -224,22 +225,21 @@ public class Client implements Runnable {
             return false;
         else {
             this.user = user;
-            userInterface.displayMessage("Вход успешен!");
+//            userInterface.displayMessage("Вход успешен!");
             return true;
         }
     }
 
-    public boolean register() {
+    public boolean register(String login, String pwd) {
         try {
             datagramChannel.register(selector, SelectionKey.OP_WRITE);
             Set keys = selector.selectedKeys();
-            String login = userInterface.readUnlimitedArgument("Придумайте логин:", false);
-            String password = "";
-            do {
-                password = getHexString(userInterface.readUnlimitedArgument("Введите пароль", false));
-            } while (password.isEmpty());
+//            String login = userInterface.readUnlimitedArgument("Придумайте логин:", false);
+//            do {
+            pwd = getHexString(pwd);
+//            } while (password.isEmpty());
             Command cmd = new Register();
-            User user = new User(login, password);
+            User user = new User(login, pwd);
             cmd.setUser(user);
             sendCommand(cmd);
             datagramChannel.register(selector, SelectionKey.OP_READ);
@@ -251,7 +251,7 @@ public class Client implements Runnable {
                 return false;
             else {
                 this.user = user;
-                userInterface.displayMessage("Вход успешен!");
+//                userInterface.displayMessage("Вход успешен!");
                 return true;
             }
         } catch (IOException e) {
