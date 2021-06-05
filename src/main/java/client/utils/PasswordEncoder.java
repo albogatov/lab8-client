@@ -1,4 +1,4 @@
-package client;
+package client.utils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

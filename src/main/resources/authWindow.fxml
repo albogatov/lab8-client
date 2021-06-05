@@ -4,16 +4,16 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="334.0" prefWidth="639.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controllers.AuthWindowController" style="-fx-background-color: #e3fae1;">
+<AnchorPane prefHeight="334.0" prefWidth="639.0" style="-fx-background-color: #e3fae1;" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controllers.AuthWindowController">
    <children>
-      <Button fx:id="loginButton" onAction="#loginAction" layoutX="151.0" layoutY="255.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="131.0" text="Button" />
-      <Button fx:id="registerButton" onAction="#registerAction" layoutX="359.0" layoutY="255.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="131.0" text="Button" />
+      <Button fx:id="loginButton" layoutX="151.0" layoutY="255.0" mnemonicParsing="false" onAction="#loginAction" prefHeight="36.0" prefWidth="131.0" text="Button" />
+      <Button fx:id="registerButton" layoutX="359.0" layoutY="255.0" mnemonicParsing="false" onAction="#registerAction" prefHeight="36.0" prefWidth="131.0" text="Button" />
       <Label alignment="CENTER" layoutX="216.0" layoutY="14.0" prefHeight="67.0" prefWidth="208.0" text="Authorisation" textAlignment="CENTER">
          <font>
             <Font size="20.0" />
          </font>
       </Label>
-      <TextField fx:id="pwdField" alignment="CENTER" layoutX="225.0" layoutY="167.0" maxWidth="200.0" minHeight="-Infinity" prefHeight="36.0" prefWidth="190.0" text="Password" />
-      <TextField fx:id="loginField" alignment="CENTER" layoutX="225.0" layoutY="108.0" maxWidth="200.0" minHeight="-Infinity" prefHeight="36.0" prefWidth="190.0" text="Username" />
+      <PasswordField fx:id="pwdField" accessibleRole="PASSWORD_FIELD" alignment="CENTER" layoutX="225.0" layoutY="167.0" maxWidth="200.0" minHeight="-Infinity" prefHeight="36.0" prefWidth="190.0" promptText="Password" />
+      <TextField fx:id="loginField" alignment="CENTER" layoutX="225.0" layoutY="108.0" maxWidth="200.0" minHeight="-Infinity" prefHeight="36.0" prefWidth="190.0" promptText="Username" />
    </children>
 </AnchorPane>

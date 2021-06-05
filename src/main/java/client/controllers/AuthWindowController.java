@@ -5,6 +5,7 @@ import client.WorkerApp;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ public class AuthWindowController {
     @FXML
     private TextField loginField = new TextField();
     @FXML
-    private TextField pwdField = new TextField();
+    private PasswordField pwdField = new PasswordField();
     @FXML
     private Button loginButton = new Button();
     @FXML
@@ -35,6 +36,8 @@ public class AuthWindowController {
     public void loginAction() throws IOException {
         if (client.login(loginField.getText(), pwdField.getText())) {
             workerApp.startMainWindow();
+        } else {
+
         }
     }
 

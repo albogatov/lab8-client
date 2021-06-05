@@ -1,6 +1,8 @@
 package client;
 
 import client.controllers.AuthWindowController;
+import client.controllers.MainWindowController;
+import client.controllers.PopUpWindowController;
 import commons.elements.Worker;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -9,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 public class WorkerApp extends Application {
 
@@ -37,17 +40,40 @@ public class WorkerApp extends Application {
     }
 
     public void startMainWindow() throws IOException {
-        FXMLLoader mainWindowLoader = new FXMLLoader(Worker.class.getResource("/mainWindow.fxml"));
+        client.initCollection();
+        HashSet<Worker> workers = client.getCollection();
+
+        FXMLLoader mainWindowLoader = new FXMLLoader(WorkerApp.class.getResource("/mainWindow.fxml"));
         Parent mainWindowRootNode = mainWindowLoader.load();
         Scene mainWindowScene = new Scene(mainWindowRootNode);
-        AuthWindowController mainWindowController = mainWindowLoader.getController();
+        MainWindowController mainWindowController = mainWindowLoader.getController();
+        mainWindowController.setWorkerApp(this);
+        mainWindowController.setClient(client);
+        mainWindowController.setCollectionRefresher(client.getCollectionRefresher());
+        mainWindowController.setData(workers);
+        mainWindowController.init();
+
+        FXMLLoader popUpWindowLoader = new FXMLLoader(WorkerApp.class.getResource("/popUpWindow.fxml"));
+        Parent popUpWindowRootNode = popUpWindowLoader.load();
+        Scene popUpWindowScene = new Scene(popUpWindowRootNode);
+        Stage popUpStage = new Stage();
+        popUpStage.setScene(popUpWindowScene);
+        PopUpWindowController popUpWindowController = popUpWindowLoader.getController();
+        popUpWindowController.setClient(client);
+        popUpWindowController.setDisplayStage(popUpStage);
+        popUpStage.setResizable(false);
+
+        mainWindowController.setPopUpWindowController(popUpWindowController);
         primaryStage.setScene(mainWindowScene);
         primaryStage.setResizable(false);
         primaryStage.show();
+//        client.run();
     }
 
     public static boolean initializeClient(String[] args) throws IOException {
         client = new Client();
+        client.setCollectionRefresher(client);
+        client.setAlertDisplay();
         try {
             if (client.connect(args[0], Integer.parseInt(args[1])))
                 return true;
