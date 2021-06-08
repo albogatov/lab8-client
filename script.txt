@@ -1,16 +1,14 @@
 add
 Donald
 27
+111
+111
 
-111
-111
-hired
 engineer
+hired
 
 100
 
 Venice
 664
-show
-help
-remove_by_id 21
+end

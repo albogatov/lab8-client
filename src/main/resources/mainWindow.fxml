@@ -2,30 +2,16 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="679.0" prefWidth="1100.0" style="-fx-background-color: b4e3af;"
-            xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="client.controllers.MainWindowController">
+<AnchorPane prefHeight="679.0" prefWidth="1100.0" style="-fx-background-color: b4e3af;" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controllers.MainWindowController">
     <children>
-        <VBox alignment="TOP_CENTER" prefHeight="680.0" prefWidth="1100.0" AnchorPane.bottomAnchor="0.0"
-              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <VBox alignment="TOP_CENTER" prefHeight="680.0" prefWidth="1100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0"
-                         style="-fx-background-color: b4e3af;">
+                <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: b4e3af;">
                     <items>
-                        <ComboBox fx:id="langChoiceComboBox" nodeOrientation="LEFT_TO_RIGHT" prefWidth="150.0"/>
-                        <Button fx:id="refreshButton" alignment="CENTER" mnemonicParsing="false"
-                                onAction="#refreshButtonOnClick" prefHeight="25.0" prefWidth="234.0"
-                                text="RefreshButton"/>
-                        <TextFlow fx:id="currentUserTextFlow" nodeOrientation="RIGHT_TO_LEFT" opacity="0.37"
-                                  prefHeight="0.0" prefWidth="200.0" textAlignment="CENTER">
-                            <children>
-                                <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#edf1f5" height="26.0" stroke="BLACK"
-                                           strokeType="INSIDE" width="194.0"/>
-                            </children>
-                        </TextFlow>
+                        <ComboBox fx:id="langChoiceComboBox" nodeOrientation="LEFT_TO_RIGHT" prefWidth="150.0" />
+                        <Button fx:id="refreshButton" alignment="CENTER" mnemonicParsing="false" onAction="#refreshButtonOnClick" prefHeight="25.0" prefWidth="234.0" text="RefreshButton" />
+                  <Label fx:id="currentUserLabel" alignment="CENTER" contentDisplay="CENTER" nodeOrientation="RIGHT_TO_LEFT" prefHeight="23.0" prefWidth="182.0" text="Label" />
                     </items>
                 </ToolBar>
                 <TabPane prefHeight="600.0" prefWidth="900.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
@@ -34,29 +20,23 @@
                             <content>
                                 <AnchorPane prefHeight="180.0" prefWidth="200.0">
                                     <children>
-                                        <TableView fx:id="workerTableView" prefHeight="598.0" prefWidth="445.0"
-                                                   style="-fx-background-color: #e3fae1;" AnchorPane.bottomAnchor="0.0"
-                                                   AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                                                   AnchorPane.topAnchor="0.0">
+                                        <TableView fx:id="workerTableView" prefHeight="598.0" prefWidth="445.0" style="-fx-background-color: #e3fae1;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <columns>
-                                                <TableColumn fx:id="idColumn" prefWidth="29.0" text="ID"/>
-                                                <TableColumn fx:id="nameColumn" prefWidth="56.0" text="Name"/>
-                                                <TableColumn prefWidth="23.0" text="X" fx:id="xColumn"/>
-                                                <TableColumn fx:id="yColumn" prefWidth="18.0" text="Y"/>
-                                                <TableColumn fx:id="salaryColumn" prefWidth="53.0" text="Salary"/>
-                                                <TableColumn fx:id="endDateColumn" prefWidth="69.0" text="End Date"/>
-                                                <TableColumn fx:id="creationDateColumn" prefWidth="92.0"
-                                                             text="Creation Date"/>
-                                                <TableColumn fx:id="positionColumn" prefWidth="89.0" text="Position"/>
-                                                <TableColumn fx:id="statusColumn" prefWidth="79.0" text="Status"/>
-                                                <TableColumn fx:id="orgColumn" prefWidth="99.0" text="Organization"/>
-                                                <TableColumn fx:id="orgTypeColumn" prefWidth="99.0" text="Org. Type"/>
-                                                <TableColumn fx:id="annualTurnoverColumn" prefWidth="94.0"
-                                                             text="Ann. Turnover"/>
-                                                <TableColumn fx:id="streetColumn" prefWidth="113.0" text="Street"/>
-                                                <TableColumn fx:id="postalCodeColumn" prefWidth="106.0"
-                                                             text="Postal Code"/>
-                                                <TableColumn fx:id="userColumn" text="User"/>
+                                                <TableColumn fx:id="idColumn" prefWidth="29.0" text="ID" />
+                                                <TableColumn fx:id="nameColumn" prefWidth="56.0" text="Name" />
+                                                <TableColumn prefWidth="23.0" text="X" fx:id="xColumn" />
+                                                <TableColumn fx:id="yColumn" prefWidth="18.0" text="Y" />
+                                                <TableColumn fx:id="salaryColumn" prefWidth="53.0" text="Salary" />
+                                                <TableColumn fx:id="endDateColumn" prefWidth="69.0" text="End Date" />
+                                                <TableColumn fx:id="creationDateColumn" prefWidth="92.0" text="Creation Date" />
+                                                <TableColumn fx:id="positionColumn" prefWidth="89.0" text="Position" />
+                                                <TableColumn fx:id="statusColumn" prefWidth="79.0" text="Status" />
+                                                <TableColumn fx:id="orgColumn" prefWidth="99.0" text="Organization" />
+                                                <TableColumn fx:id="orgTypeColumn" prefWidth="99.0" text="Org. Type" />
+                                                <TableColumn fx:id="annualTurnoverColumn" prefWidth="94.0" text="Ann. Turnover" />
+                                                <TableColumn fx:id="streetColumn" prefWidth="113.0" text="Street" />
+                                                <TableColumn fx:id="postalCodeColumn" prefWidth="106.0" text="Postal Code" />
+                                                <TableColumn fx:id="userColumn" text="User" />
                                             </columns>
                                         </TableView>
                                     </children>
@@ -65,51 +45,31 @@
                         </Tab>
                         <Tab fx:id="visualMapTab" text="Visual Map">
                             <content>
-                                <AnchorPane fx:id="visualMapPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0"
-                                            prefWidth="200.0"
-                                            style="-fx-background-color: #e3fae1, linear-gradient(from 0.5px 0.0px to 10.5px  0.0px, repeat, grey 5%, transparent 5%),                             linear-gradient(from 0.0px 0.5px to  0.0px 10.5px, repeat, grey 5%, transparent 5%);">
+                                <AnchorPane fx:id="visualMapPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: #e3fae1, linear-gradient(from 0.5px 0.0px to 10.5px  0.0px, repeat, grey 5%, transparent 5%),                             linear-gradient(from 0.0px 0.5px to  0.0px 10.5px, repeat, grey 5%, transparent 5%);">
                                     <children>
-                                        <AnchorPane layoutX="-3.0" layoutY="-3.0" prefHeight="467.0" prefWidth="921.0"/>
+                                        <AnchorPane layoutX="-3.0" layoutY="-3.0" prefHeight="467.0" prefWidth="921.0" />
                                     </children>
                                 </AnchorPane>
                             </content>
                         </Tab>
                     </tabs>
                 </TabPane>
-                <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" prefHeight="137.0" prefWidth="932.0"
-                          vgap="10.0">
+                <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" prefHeight="137.0" prefWidth="932.0" vgap="10.0">
                     <children>
-                        <Button fx:id="addButton" mnemonicParsing="false" onAction="#addButtonOnClick" prefHeight="25.0"
-                                prefWidth="137.0" text="addButton"/>
-                        <Button fx:id="updateButton" mnemonicParsing="false" onAction="#updateButtonOnClick"
-                                prefHeight="25.0" prefWidth="137.0" text="updateButton"/>
-                        <Button fx:id="removeButton" mnemonicParsing="false" onAction="#removeButtonOnClick"
-                                prefHeight="25.0" prefWidth="137.0" text="removeButton"/>
-                        <Button fx:id="addIfMinButton" mnemonicParsing="false" onAction="#addIfMinButtonOnClick"
-                                prefHeight="25.0" prefWidth="137.0" text="addIfMinButton"/>
-                        <Button fx:id="removeGreaterButton" mnemonicParsing="false"
-                                onAction="#removeGreaterButtonOnClick" prefHeight="25.0" prefWidth="137.0"
-                                text="removeGreaterButton"/>
-                        <Button fx:id="removeLowerButton" mnemonicParsing="false" onAction="#removeLowerButtonOnClick"
-                                prefHeight="25.0" prefWidth="137.0" text="removeLowerButton"/>
-                        <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveButtonOnClick"
-                                prefHeight="25.0" prefWidth="137.0" text="saveButton"/>
-                        <Button fx:id="executeScriptButton" mnemonicParsing="false"
-                                onAction="#executeScriptButtonOnClick" prefHeight="25.0" prefWidth="137.0"
-                                text="executeScriptButton"/>
-                        <Button fx:id="clearButton" mnemonicParsing="false" onAction="#clearButtonOnClick"
-                                prefHeight="25.0" prefWidth="137.0" text="clearButton"/>
-                        <Button fx:id="helpButton" mnemonicParsing="false" onAction="#helpButtonOnClick"
-                                prefHeight="25.0" prefWidth="137.0" text="helpButton"/>
-                        <Button fx:id="infoButton" mnemonicParsing="false" onAction="#infoButtonOnClick"
-                                prefHeight="25.0" prefWidth="137.0" text="infoButton"/>
-                        <Button fx:id="countByStatusButton" mnemonicParsing="false"
-                                onAction="#countByStatusButtonOnClick" prefHeight="25.0" prefWidth="137.0"
-                                text="countByStatusButton"/>
-                        <Button fx:id="printUniqueOrgsButton" mnemonicParsing="false"
-                                onAction="#printUniqueOrgsButtonOnClick" prefHeight="25.0" prefWidth="137.0"
-                                text="printUniqueOrgsButton"/>
-                        <VBox alignment="BASELINE_CENTER" nodeOrientation="LEFT_TO_RIGHT"/>
+                        <Button fx:id="addButton" mnemonicParsing="false" onAction="#addButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="addButton" />
+                        <Button fx:id="updateButton" mnemonicParsing="false" onAction="#updateButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="updateButton" />
+                        <Button fx:id="removeButton" mnemonicParsing="false" onAction="#removeButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="removeButton" />
+                        <Button fx:id="addIfMinButton" mnemonicParsing="false" onAction="#addIfMinButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="addIfMinButton" />
+                        <Button fx:id="removeGreaterButton" mnemonicParsing="false" onAction="#removeGreaterButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="removeGreaterButton" />
+                        <Button fx:id="removeLowerButton" mnemonicParsing="false" onAction="#removeLowerButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="removeLowerButton" />
+                        <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="saveButton" />
+                        <Button fx:id="executeScriptButton" mnemonicParsing="false" onAction="#executeScriptButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="executeScriptButton" />
+                        <Button fx:id="clearButton" mnemonicParsing="false" onAction="#clearButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="clearButton" />
+                        <Button fx:id="helpButton" mnemonicParsing="false" onAction="#helpButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="helpButton" />
+                        <Button fx:id="infoButton" mnemonicParsing="false" onAction="#infoButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="infoButton" />
+                        <Button fx:id="countByStatusButton" mnemonicParsing="false" onAction="#countByStatusButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="countByStatusButton" />
+                        <Button fx:id="printUniqueOrgsButton" mnemonicParsing="false" onAction="#printUniqueOrgsButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="printUniqueOrgsButton" />
+                        <VBox alignment="BASELINE_CENTER" nodeOrientation="LEFT_TO_RIGHT" />
                     </children>
                 </FlowPane>
             </children>

@@ -2,12 +2,14 @@ package client.controllers;
 
 import client.Client;
 import client.WorkerApp;
+import client.utils.AlertDisplay;
 import client.utils.CollectionRefresher;
 import client.utils.LocalizationTool;
 
 import commons.elements.*;
 import javafx.animation.ScaleTransition;
 
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,9 +24,11 @@ import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.File;
 import java.util.*;
 
 public class MainWindowController {
@@ -56,6 +60,10 @@ public class MainWindowController {
     private Random randomGenerator;
 
     private LocalizationTool localizationTool;
+
+    private FileChooser fileChooser;
+
+    private Stage primaryStage;
 
     private String ADD = "add";
 
@@ -180,7 +188,7 @@ public class MainWindowController {
     private ComboBox<String> langChoiceComboBox;
 
     @FXML
-    private TextFlow currentUserTextFlow;
+    private Label currentUserLabel;
 
     @FXML
     private Tab visualMapTab;
@@ -222,6 +230,8 @@ public class MainWindowController {
         textMap = new HashMap<>();
         userColorMap = new HashMap<>();
         randomGenerator = new Random();
+        fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File("."));
         getTable();
     }
 
@@ -247,6 +257,8 @@ public class MainWindowController {
             Worker worker = popUpWindowController.getResult();
             if (worker != null)
                 requestCommand(UPDATE, id + "", worker);
+        } else {
+            AlertDisplay.showError("ObjectNotChosen");
         }
     }
 
@@ -255,6 +267,8 @@ public class MainWindowController {
         if (!workerTableView.getSelectionModel().isEmpty()) {
             Worker worker = workerTableView.getSelectionModel().getSelectedItem();
             requestCommand(REMOVE_BY_ID, worker.getId() + "");
+        } else {
+            AlertDisplay.showError("ObjectNotChosen");
         }
     }
 
@@ -263,6 +277,8 @@ public class MainWindowController {
         if (!workerTableView.getSelectionModel().isEmpty()) {
             Worker worker = workerTableView.getSelectionModel().getSelectedItem();
             requestCommand(REMOVE_GREATER, worker);
+        } else {
+            AlertDisplay.showError("ObjectNotChosen");
         }
     }
 
@@ -271,6 +287,8 @@ public class MainWindowController {
         if (!workerTableView.getSelectionModel().isEmpty()) {
             Worker worker = workerTableView.getSelectionModel().getSelectedItem();
             requestCommand(REMOVE_LOWER, worker);
+        } else {
+            AlertDisplay.showError("ObjectNotChosen");
         }
     }
 
@@ -290,7 +308,17 @@ public class MainWindowController {
 
     @FXML
     public void executeScriptButtonOnClick() {
-
+//        File selectedFile = fileChooser.showOpenDialog(primaryStage);
+//        if (selectedFile == null) return;
+//        if (client.processScriptToServer(selectedFile)) Platform.exit();
+//        else refreshButtonOnAction();
+        File scriptFile = fileChooser.showOpenDialog(primaryStage);
+        if (scriptFile == null)
+            return;
+        if (client.executeScript(scriptFile))
+            AlertDisplay.showInfo("ScriptSuccess");
+        else AlertDisplay.showError("ScriptError");
+        refreshButtonOnClick();
     }
 
     @FXML
@@ -321,8 +349,6 @@ public class MainWindowController {
     @FXML
     public void refreshButtonOnClick() {
         try {
-//            data = FXCollections.observableArrayList(collectionRefresher.getCollection());
-//            getTable();
             requestCommand("show");
             visualise();
         } catch (NullPointerException e) {
@@ -408,20 +434,12 @@ public class MainWindowController {
     }
 
     public void requestCommand(String command, String argument, Worker object) {
-//        Thread.sleep(100);
-//        try {
         HashSet<Worker> result = client.processRequestFromUser(command, argument, object);
         if (result != null) {
-            System.out.println(result);
             workerTableView.setItems(FXCollections.observableArrayList(result));
             workerTableView.getSelectionModel().clearSelection();
+            visualise();
         }
-//            Thread.sleep(1000);
-//            data = FXCollections.observableArrayList(collectionRefresher.getCollection());
-//            getTable();
-//        } catch (InterruptedException e) {
-//
-//        }
     }
 
     public void setResources(LocalizationTool localizationTool) {
@@ -477,6 +495,8 @@ public class MainWindowController {
 
     public void setClient(Client client) {
         this.client = client;
+        currentUserLabel.setText(client.getUser().getLogin());
+        currentUserLabel.setStyle("-fx-border-color: white;");
     }
 
     public void setWorkerApp(WorkerApp app) {
@@ -490,5 +510,9 @@ public class MainWindowController {
     public void setPopUpWindowController(PopUpWindowController controller) {
         this.popUpWindowController = controller;
         this.popUpStage = controller.getDisplayStage();
+    }
+
+    public void setPrimaryStage(Stage stage) {
+        this.primaryStage = stage;
     }
 }

@@ -79,7 +79,6 @@ public class WorkerApp extends Application {
         primaryStage.setResizable(false);
         mainWindowController.refreshButtonOnClick();
         primaryStage.show();
-//        client.run();
     }
 
     public static boolean initializeClient(String[] args) throws IOException {

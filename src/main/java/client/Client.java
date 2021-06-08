@@ -2,6 +2,7 @@ package client;
 
 import client.utils.AlertDisplay;
 import client.utils.CollectionRefresher;
+import client.utils.ScriptExecutor;
 import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import commons.app.*;
 import commons.commands.Login;
@@ -90,7 +91,7 @@ public class Client {
             byte[] answer = receiveAnswer();
             serverResponse = (Response) new SerializationTool().deserializeObject(answer);
             System.out.println(serverResponse.getResponseBody() + " response body");
-            if (!serverResponse.getResponseBody().equals("Empty")) {
+            if (!serverResponse.getResponseBody().equals("Empty") || serverResponse.getResponseBody().equals("")) {
                 if (serverResponse.getResponseCode().equals(ResponseCode.ERROR))
                     AlertDisplay.showError(serverResponse.getResponseBody());
                 else AlertDisplay.showInfo(serverResponse.getResponseBody());
@@ -109,8 +110,47 @@ public class Client {
             AlertDisplay.showError("FatalConnectionError");
             return null;
         } catch (InterruptedException e) {
+            AlertDisplay.showError("FatalConnectionError");
             return null;
         }
+    }
+
+    public boolean executeScript(File script) {
+        Request requestToServer = null;
+        Response serverResponse = null;
+        ScriptExecutor scriptExecutor = new ScriptExecutor(script);
+        try {
+            while (true) {
+                requestToServer = serverResponse != null ? scriptExecutor.process(serverResponse.getResponseCode(),
+                        user) : scriptExecutor.process(null, user);
+                if (requestToServer == null)
+                    return false;
+                if (requestToServer.isEmpty())
+                    continue;
+                Set keys = selector.selectedKeys();
+                keys.clear();
+                datagramChannel.register(selector, SelectionKey.OP_WRITE);
+                if (requestToServer.getCommandName().equals("end"))
+                    break;
+                sendRequest(requestToServer);
+                Thread.sleep(300);
+                datagramChannel.register(selector, SelectionKey.OP_READ);
+                selector.select();
+                byte[] answer = receiveAnswer();
+                serverResponse = (Response) new SerializationTool().deserializeObject(answer);
+                if (!serverResponse.getResponseBody().isEmpty()) {
+                    if (serverResponse.getResponseCode().equals(ResponseCode.ERROR))
+                        return false;
+                }
+            }
+        } catch (InterruptedException e) {
+            AlertDisplay.showError("FatalConnectionError");
+            return false;
+        } catch (IOException e) {
+            AlertDisplay.showError("FatalConnectionError");
+            return false;
+        }
+        return true;
     }
 
     public boolean login(String login, String pwd) {
@@ -129,11 +169,11 @@ public class Client {
             serverResponse = (Response) new SerializationTool().deserializeObject(receiveAnswer());
             System.out.println(serverResponse.getResponseBody() + "response body " + serverResponse.getResponseCode().toString());
             if (serverResponse.getResponseCode().equals(ResponseCode.ERROR)) {
-                if (!serverResponse.getResponseBody().equals("Empty"))
+                if (!serverResponse.getResponseBody().equals("Empty") || serverResponse.getResponseBody().equals(""))
                     AlertDisplay.showError(serverResponse.getResponseBody());
                 return false;
             } else {
-                if (!serverResponse.getResponseBody().equals("Empty"))
+                if (!serverResponse.getResponseBody().equals("Empty") || serverResponse.getResponseBody().equals(""))
                     AlertDisplay.showInfo(serverResponse.getResponseBody());
                 this.user = user;
 //            userInterface.displayMessage("Вход успешен!");
@@ -151,33 +191,36 @@ public class Client {
     }
 
     public boolean register(String login, String pwd) {
+        Request requestToServer = null;
+        Response serverResponse = null;
         try {
-            datagramChannel.register(selector, SelectionKey.OP_WRITE);
             Set keys = selector.selectedKeys();
-//            String login = userInterface.readUnlimitedArgument("Придумайте логин:", false);
-//            do {
-            pwd = getHexString(pwd);
-//            } while (password.isEmpty());
-            Command cmd = new Register();
-            User user = new User(login, pwd);
-            cmd.setUser(user);
-            sendRequest(new Request(cmd.getCommand(), "", user));
-//            sendCommand(cmd);
-//            sendRequest(new Request("login", ));
+            keys.clear();
+            datagramChannel.register(selector, SelectionKey.OP_WRITE);
+            User user = new User(login, getHexString(pwd));
+            requestToServer = new Request("register", "", null, user);
+            sendRequest(requestToServer);
+            Thread.sleep(300);
             datagramChannel.register(selector, SelectionKey.OP_READ);
             selector.select();
-            byte[] toBeReceived = receiveAnswer();
-            Response response = (Response) new SerializationTool().deserializeObject(toBeReceived);
-            keys.clear();
-            if (response.getResponseCode().equals(ResponseCode.ERROR))
+            serverResponse = (Response) new SerializationTool().deserializeObject(receiveAnswer());
+            System.out.println(serverResponse.getResponseBody() + "response body " + serverResponse.getResponseCode().toString());
+            if (serverResponse.getResponseCode().equals(ResponseCode.ERROR)) {
+                if (!serverResponse.getResponseBody().equals("Empty") || serverResponse.getResponseBody().equals(""))
+                    AlertDisplay.showError(serverResponse.getResponseBody());
                 return false;
-            else {
+            } else {
+                if (!serverResponse.getResponseBody().equals("Empty") || serverResponse.getResponseBody().equals(""))
+                    AlertDisplay.showInfo(serverResponse.getResponseBody());
                 this.user = user;
-//                userInterface.displayMessage("Вход успешен!");
+//            userInterface.displayMessage("Вход успешен!");
                 return true;
             }
+        } catch (PortUnreachableException e) {
+            AlertDisplay.showError("PortUnavailableError");
+            return false;
         } catch (IOException e) {
-            e.printStackTrace();
+            AlertDisplay.showError("FatalConnectionError");
             return false;
         } catch (InterruptedException e) {
             return false;

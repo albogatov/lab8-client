@@ -1,6 +1,7 @@
 package client.controllers;
 
 import client.Client;
+import client.utils.AlertDisplay;
 import client.utils.LocalizationTool;
 import commons.elements.*;
 import javafx.collections.FXCollections;
@@ -89,7 +90,7 @@ public class PopUpWindowController {
                     new Organization(parseAnnualTurnover(), orgTypeComboBox.getValue(), new Address(streetField.getText(),
                             postalCodeField.getText()), orgNameField.getText()), client.getUser().getLogin());
         } catch (IllegalArgumentException e) {
-
+            AlertDisplay.showError("WrongEnteredData");
         }
         displayStage.close();
     }
@@ -119,9 +120,6 @@ public class PopUpWindowController {
         annualTurnoverField.clear();
         streetField.clear();
         postalCodeField.clear();
-//        positionComboBox.setPromptText("Choose position");
-//        statusComboBox.setPromptText("Choose status");
-//        orgTypeComboBox.setPromptText("Choose org. type");
     }
 
     public Worker getResult() {
