@@ -84,7 +84,7 @@
                         <Button fx:id="updateButton" mnemonicParsing="false" onAction="#updateButtonOnClick"
                                 prefHeight="25.0" prefWidth="137.0" text="updateButton"/>
                         <Button fx:id="removeButton" mnemonicParsing="false" onAction="#removeButtonOnClick"
-                                prefHeight="25.0" prefWidth="137.0" text="updateButton"/>
+                                prefHeight="25.0" prefWidth="137.0" text="removeButton"/>
                         <Button fx:id="addIfMinButton" mnemonicParsing="false" onAction="#addIfMinButtonOnClick"
                                 prefHeight="25.0" prefWidth="137.0" text="addIfMinButton"/>
                         <Button fx:id="removeGreaterButton" mnemonicParsing="false"

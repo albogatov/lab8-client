@@ -2,6 +2,8 @@ package client.controllers;
 
 import client.Client;
 import client.WorkerApp;
+import client.utils.AlertDisplay;
+import client.utils.LocalizationTool;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -9,16 +11,17 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
+import java.net.PortUnreachableException;
 
 public class AuthWindowController {
-    Client client;
+    private Client client;
 
-    WorkerApp workerApp;
+    private WorkerApp workerApp;
 
-    //    @FXML
-//    private Label loginLabel;
-//    @FXML
-//    private Label pwdLabel;
+    private LocalizationTool localizationTool;
+
+    @FXML
+    private Label loginLabel = new Label();
     @FXML
     private TextField loginField = new TextField();
     @FXML
@@ -34,17 +37,23 @@ public class AuthWindowController {
 
     @FXML
     public void loginAction() throws IOException {
-        if (client.login(loginField.getText(), pwdField.getText())) {
-            workerApp.startMainWindow();
-        } else {
-
+        try {
+            if (client.login(loginField.getText(), pwdField.getText())) {
+                workerApp.startMainWindow();
+            }
+        } catch (PortUnreachableException e) {
+            AlertDisplay.showError("TryLater");
         }
     }
 
     @FXML
     public void registerAction() throws IOException {
-        if (client.register(loginField.getText(), pwdField.getText())) {
-            workerApp.startMainWindow();
+        try {
+            if (client.register(loginField.getText(), pwdField.getText())) {
+                workerApp.startMainWindow();
+            }
+        } catch (PortUnreachableException e) {
+            AlertDisplay.showError("TryLater");
         }
     }
 
@@ -54,5 +63,14 @@ public class AuthWindowController {
 
     public void setWorkerApp(WorkerApp app) {
         this.workerApp = app;
+    }
+
+    public void initLangs(LocalizationTool localizationTool) {
+        this.localizationTool = localizationTool;
+        loginLabel.textProperty().bind(localizationTool.getStringBinding("LoginLabel"));
+        loginField.promptTextProperty().bind(localizationTool.getStringBinding("LoginFieldText"));
+        pwdField.promptTextProperty().bind(localizationTool.getStringBinding("PwdFieldText"));
+        loginButton.textProperty().bind(localizationTool.getStringBinding("LoginButton"));
+        registerButton.textProperty().bind(localizationTool.getStringBinding("RegisterButton"));
     }
 }

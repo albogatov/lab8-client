@@ -1,10 +1,10 @@
 package client.utils;
 
 import client.Client;
-import commons.app.Command;
 import commons.app.User;
-import commons.commands.Show;
 import commons.elements.Worker;
+import commons.network.Request;
+import commons.network.Response;
 import commons.utils.SerializationTool;
 
 import java.io.IOException;
@@ -25,37 +25,27 @@ public class CollectionRefresher {
         this.client = client;
     }
 
-    public HashSet<Worker> getCollection() {
-        try {
-            DatagramChannel datagramChannel = DatagramChannel.open();
-            SocketAddress socketAddress = new InetSocketAddress(InetAddress.getLocalHost(), client.getPort());
-            datagramChannel.connect(socketAddress);
-            datagramChannel.configureBlocking(false);
-            Selector selector = client.getSelector();
-            User user = client.getUser();
-            datagramChannel.register(selector, SelectionKey.OP_WRITE);
-            Set keys = selector.selectedKeys();
-            Command cmd = new Show();
-            cmd.setUser(user);
-            client.sendCommand(cmd);
-            datagramChannel.register(selector, SelectionKey.OP_READ);
-            selector.select();
-            byte[] toBeReceived = client.receiveAnswer();
-            HashSet<Worker> answer;
-            String test;
-            try {
-                answer = (HashSet<Worker>) new SerializationTool().deserializeObject(toBeReceived);
-                keys.clear();
-                answer.stream().forEach(worker -> System.out.println(worker.displayWorker()));
-                return answer;
-            } catch (ClassCastException e) {
-                test = (String) new SerializationTool().deserializeObject(toBeReceived);
-                System.out.println(test);
-                return null;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+//    public HashSet<Worker> getCollection() {
+////        try {
+////            DatagramChannel datagramChannel = DatagramChannel.open();
+////            SocketAddress socketAddress = new InetSocketAddress(InetAddress.getLocalHost(), client.getPort());
+////            datagramChannel.connect(socketAddress);
+////            datagramChannel.configureBlocking(false);
+////            Selector selector = client.getSelector();
+////            User user = client.getUser();
+////            datagramChannel.register(selector, SelectionKey.OP_WRITE);
+////            Set keys = selector.selectedKeys();
+////            Request request = new Request("show", "", client.getUser());
+////            client.sendRequest(request);
+////            datagramChannel.register(selector, SelectionKey.OP_READ);
+////            selector.select();
+////            byte[] toBeReceived = client.receiveAnswer();
+////            Response response = (Response) new SerializationTool().deserializeObject(toBeReceived);
+////            keys.clear();
+////            return response.getCollection();
+////        } catch (IOException e) {
+////            e.printStackTrace();
+////            return null;
+////        }
+//    }
 }

@@ -3,38 +3,59 @@ package client.controllers;
 import client.Client;
 import client.WorkerApp;
 import client.utils.CollectionRefresher;
-import com.sun.org.apache.regexp.internal.RE;
+import client.utils.LocalizationTool;
+
 import commons.elements.*;
-import javafx.beans.Observable;
+import javafx.animation.ScaleTransition;
+
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
+
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Shape;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
-import org.apache.commons.lang3.ObjectUtils;
+import javafx.util.Duration;
 
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.HashSet;
+import java.util.*;
 
 public class MainWindowController {
 
-    Client client;
+    private Client client;
 
-    WorkerApp workerApp;
+    private WorkerApp workerApp;
 
-    ObservableList<Worker> data;
+    private ObservableList<Worker> data;
 
     private PopUpWindowController popUpWindowController;
 
     private CollectionRefresher collectionRefresher;
 
     private Stage popUpStage;
+
+    private Map<String, Color> userColorMap;
+
+    private Map<Shape, Long> shapeMap;
+
+    private Map<Long, Text> textMap;
+
+    private Map<String, Locale> localeMap;
+
+    private Shape prevClicked;
+
+    private Color prevColor;
+
+    private Random randomGenerator;
+
+    private LocalizationTool localizationTool;
 
     private String ADD = "add";
 
@@ -191,27 +212,21 @@ public class MainWindowController {
         streetColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getAddressStreet()));
         postalCodeColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getAddressZipCode()));
         userColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getUsername()));
+        localeMap = new HashMap<>();
+        localeMap.put("Русский", new Locale("ru", "RU"));
+//        localeMap.put("Shqiptare", new Locale("sq", "AL"));
+//        localeMap.put("Slovák", new Locale("sk", "SK"));
+        localeMap.put("English (Canada)", new Locale("en", "CA"));
+        langChoiceComboBox.setItems(FXCollections.observableArrayList(localeMap.keySet()));
+        shapeMap = new HashMap<>();
+        textMap = new HashMap<>();
+        userColorMap = new HashMap<>();
+        randomGenerator = new Random();
         getTable();
     }
 
     public void getTable() {
-        System.out.println("refreshing");
         workerTableView.setItems(data);
-//        workerTableView.getColumns().add(idColumn);
-//        workerTableView.getColumns().add(nameColumn);
-//        workerTableView.getColumns().add(xColumn);
-//        workerTableView.getColumns().add(yColumn);
-//        workerTableView.getColumns().add(salaryColumn);
-//        workerTableView.getColumns().add(endDateColumn);
-//        workerTableView.getColumns().add(creationDateColumn);
-//        workerTableView.getColumns().add(positionColumn);
-//        workerTableView.getColumns().add(statusColumn);
-//        workerTableView.getColumns().add(orgColumn);
-//        workerTableView.getColumns().add(orgTypeColumn);
-//        workerTableView.getColumns().add(annualTurnoverColumn);
-//        workerTableView.getColumns().add(streetColumn);
-//        workerTableView.getColumns().add(postalCodeColumn);
-//        workerTableView.getColumns().add(userColumn);
     }
 
     @FXML
@@ -306,11 +321,77 @@ public class MainWindowController {
     @FXML
     public void refreshButtonOnClick() {
         try {
-            data = FXCollections.observableArrayList(collectionRefresher.getCollection());
-            getTable();
+//            data = FXCollections.observableArrayList(collectionRefresher.getCollection());
+//            getTable();
+            requestCommand("show");
+            visualise();
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
+    }
+
+    private void visualise() {
+        shapeMap.keySet().forEach(s -> visualMapPane.getChildren().remove(s));
+        shapeMap.clear();
+        textMap.values().forEach(s -> visualMapPane.getChildren().remove(s));
+        textMap.clear();
+        for (Worker worker : workerTableView.getItems()) {
+            if (!userColorMap.containsKey(worker.getUsername()))
+                userColorMap.put(worker.getUsername(),
+                        Color.color(randomGenerator.nextDouble(), randomGenerator.nextDouble(), randomGenerator.nextDouble()));
+
+            double size = Math.min(worker.getSalary(), 250);
+
+            Shape circleObject = new Circle(size, userColorMap.get(worker.getUsername()));
+            circleObject.setOnMouseClicked(this::shapeOnMouseClicked);
+            circleObject.translateXProperty().bind(visualMapPane.widthProperty().divide(2).add(worker.getCoordinateX()));
+            circleObject.translateYProperty().bind(visualMapPane.heightProperty().divide(2).subtract(worker.getCoordinateY()));
+
+            Text textObject = new Text(String.valueOf(worker.getId()));
+            textObject.setOnMouseClicked(circleObject::fireEvent);
+            textObject.setFont(Font.font(size / 3));
+            textObject.setFill(userColorMap.get(worker.getUsername()).darker());
+            textObject.translateXProperty().bind(circleObject.translateXProperty().subtract(textObject.getLayoutBounds().getWidth() / 2));
+            textObject.translateYProperty().bind(circleObject.translateYProperty().add(textObject.getLayoutBounds().getHeight() / 4));
+
+            visualMapPane.getChildren().add(circleObject);
+            visualMapPane.getChildren().add(textObject);
+            shapeMap.put(circleObject, worker.getId());
+            textMap.put(worker.getId(), textObject);
+
+            ScaleTransition circleAnimation = new ScaleTransition(Duration.millis(1000), circleObject);
+            ScaleTransition textAnimation = new ScaleTransition(Duration.millis(1000), textObject);
+            circleAnimation.setFromX(0);
+            circleAnimation.setToX(1);
+            circleAnimation.setFromY(0);
+            circleAnimation.setToY(1);
+            textAnimation.setFromX(0);
+            textAnimation.setToX(1);
+            textAnimation.setFromY(0);
+            textAnimation.setToY(1);
+            circleAnimation.play();
+            textAnimation.play();
+        }
+    }
+
+    /**
+     * Shape on mouse clicked.
+     */
+    private void shapeOnMouseClicked(MouseEvent event) {
+        Shape shape = (Shape) event.getSource();
+        long id = shapeMap.get(shape);
+        for (Worker worker : workerTableView.getItems()) {
+            if (worker.getId() == id) {
+                workerTableView.getSelectionModel().select(worker);
+                break;
+            }
+        }
+        if (prevClicked != null) {
+            prevClicked.setFill(prevColor);
+        }
+        prevClicked = shape;
+        prevColor = (Color) shape.getFill();
+        shape.setFill(prevColor.brighter());
     }
 
     public void requestCommand(String command, Worker object) {
@@ -328,14 +409,70 @@ public class MainWindowController {
 
     public void requestCommand(String command, String argument, Worker object) {
 //        Thread.sleep(100);
-        try {
-            client.processRequestFromUser(command, argument, object);
-            Thread.sleep(1000);
-            data = FXCollections.observableArrayList(collectionRefresher.getCollection());
-            getTable();
-        } catch (InterruptedException e) {
-
+//        try {
+        HashSet<Worker> result = client.processRequestFromUser(command, argument, object);
+        if (result != null) {
+            System.out.println(result);
+            workerTableView.setItems(FXCollections.observableArrayList(result));
+            workerTableView.getSelectionModel().clearSelection();
         }
+//            Thread.sleep(1000);
+//            data = FXCollections.observableArrayList(collectionRefresher.getCollection());
+//            getTable();
+//        } catch (InterruptedException e) {
+//
+//        }
+    }
+
+    public void setResources(LocalizationTool localizationTool) {
+        this.localizationTool = localizationTool;
+        for (String localeName : localeMap.keySet()) {
+            if (localeMap.get(localeName).equals(localizationTool.getResources().getLocale()))
+                langChoiceComboBox.getSelectionModel().select(localeName);
+        }
+        if (langChoiceComboBox.getSelectionModel().getSelectedItem().isEmpty())
+            langChoiceComboBox.getSelectionModel().selectFirst();
+        langChoiceComboBox.setOnAction((action) -> {
+            localizationTool.setResources(ResourceBundle.getBundle("bundles.ui",
+                    localeMap.get(langChoiceComboBox.getValue())));
+        });
+        bindLanguage();
+    }
+
+    public void bindLanguage() {
+        localizationTool.setResources(ResourceBundle.getBundle("bundles.ui",
+                localeMap.get(langChoiceComboBox.getSelectionModel().getSelectedItem())));
+        idColumn.textProperty().bind(localizationTool.getStringBinding("IdColumn"));
+        nameColumn.textProperty().bind(localizationTool.getStringBinding("NameColumn"));
+        xColumn.textProperty().bind(localizationTool.getStringBinding("XColumn"));
+        yColumn.textProperty().bind(localizationTool.getStringBinding("YColumn"));
+        salaryColumn.textProperty().bind(localizationTool.getStringBinding("SalaryColumn"));
+        endDateColumn.textProperty().bind(localizationTool.getStringBinding("EndDateColumn"));
+        creationDateColumn.textProperty().bind(localizationTool.getStringBinding("CreationDateColumn"));
+        positionColumn.textProperty().bind(localizationTool.getStringBinding("PositionColumn"));
+        statusColumn.textProperty().bind(localizationTool.getStringBinding("StatusColumn"));
+        orgColumn.textProperty().bind(localizationTool.getStringBinding("OrgColumn"));
+        orgTypeColumn.textProperty().bind(localizationTool.getStringBinding("OrgTypeColumn"));
+        annualTurnoverColumn.textProperty().bind(localizationTool.getStringBinding("AnnualTurnoverColumn"));
+        streetColumn.textProperty().bind(localizationTool.getStringBinding("StreetColumn"));
+        postalCodeColumn.textProperty().bind(localizationTool.getStringBinding("PostalCodeColumn"));
+        userColumn.textProperty().bind(localizationTool.getStringBinding("UserColumn"));
+        refreshButton.textProperty().bind(localizationTool.getStringBinding("RefreshButton"));
+        addButton.textProperty().bind(localizationTool.getStringBinding("AddButton"));
+        updateButton.textProperty().bind(localizationTool.getStringBinding("UpdateButton"));
+        removeButton.textProperty().bind(localizationTool.getStringBinding("RemoveButton"));
+        removeGreaterButton.textProperty().bind(localizationTool.getStringBinding("RemoveGreaterButton"));
+        removeLowerButton.textProperty().bind(localizationTool.getStringBinding("RemoveLowerButton"));
+        clearButton.textProperty().bind(localizationTool.getStringBinding("ClearButton"));
+        helpButton.textProperty().bind(localizationTool.getStringBinding("HelpButton"));
+        infoButton.textProperty().bind(localizationTool.getStringBinding("InfoButton"));
+        countByStatusButton.textProperty().bind(localizationTool.getStringBinding("CountByStatusButton"));
+        printUniqueOrgsButton.textProperty().bind(localizationTool.getStringBinding("PrintUniqueOrgsButton"));
+        addIfMinButton.textProperty().bind(localizationTool.getStringBinding("AddIfMinButton"));
+        saveButton.textProperty().bind(localizationTool.getStringBinding("SaveButton"));
+        executeScriptButton.textProperty().bind(localizationTool.getStringBinding("ExecuteScriptButton"));
+        visualMapTab.textProperty().bind(localizationTool.getStringBinding("VisualMapTab"));
+        dataTableTab.textProperty().bind(localizationTool.getStringBinding("DataTableTab"));
     }
 
     public void setClient(Client client) {

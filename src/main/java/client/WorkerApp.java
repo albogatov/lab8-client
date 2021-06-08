@@ -3,6 +3,7 @@ package client;
 import client.controllers.AuthWindowController;
 import client.controllers.MainWindowController;
 import client.controllers.PopUpWindowController;
+import client.utils.LocalizationTool;
 import commons.elements.Worker;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -12,6 +13,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.ResourceBundle;
 
 public class WorkerApp extends Application {
 
@@ -19,7 +21,11 @@ public class WorkerApp extends Application {
 
     private static Client client;
 
+    private static LocalizationTool localizationTool;
+
     public static void main(String[] args) throws IOException {
+        localizationTool = new LocalizationTool();
+        localizationTool.setResources(ResourceBundle.getBundle("bundles.ui"));
         if (initializeClient(args))
             launch(args);
         else System.exit(-1);
@@ -34,6 +40,7 @@ public class WorkerApp extends Application {
         AuthWindowController authWindowController = authWindowLoader.getController();
         authWindowController.setWorkerApp(this);
         authWindowController.setClient(client);
+        authWindowController.initLangs(localizationTool);
         primaryStage.setScene(authWindowScene);
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -52,6 +59,7 @@ public class WorkerApp extends Application {
         mainWindowController.setCollectionRefresher(client.getCollectionRefresher());
         mainWindowController.setData(workers);
         mainWindowController.init();
+        mainWindowController.setResources(localizationTool);
 
         FXMLLoader popUpWindowLoader = new FXMLLoader(WorkerApp.class.getResource("/popUpWindow.fxml"));
         Parent popUpWindowRootNode = popUpWindowLoader.load();
@@ -61,11 +69,13 @@ public class WorkerApp extends Application {
         PopUpWindowController popUpWindowController = popUpWindowLoader.getController();
         popUpWindowController.setClient(client);
         popUpWindowController.setDisplayStage(popUpStage);
+        popUpWindowController.initLangs(localizationTool);
         popUpStage.setResizable(false);
 
         mainWindowController.setPopUpWindowController(popUpWindowController);
         primaryStage.setScene(mainWindowScene);
         primaryStage.setResizable(false);
+        mainWindowController.refreshButtonOnClick();
         primaryStage.show();
 //        client.run();
     }
