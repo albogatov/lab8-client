@@ -3,6 +3,7 @@ package client;
 import client.controllers.AuthWindowController;
 import client.controllers.MainWindowController;
 import client.controllers.PopUpWindowController;
+import client.utils.AlertDisplay;
 import client.utils.LocalizationTool;
 import commons.elements.Worker;
 import javafx.application.Application;
@@ -26,6 +27,7 @@ public class WorkerApp extends Application {
     public static void main(String[] args) throws IOException {
         localizationTool = new LocalizationTool();
         localizationTool.setResources(ResourceBundle.getBundle("bundles.ui"));
+        AlertDisplay.setLocalizationTool(localizationTool);
         if (initializeClient(args))
             launch(args);
         else System.exit(-1);

@@ -90,9 +90,11 @@ public class Client {
             byte[] answer = receiveAnswer();
             serverResponse = (Response) new SerializationTool().deserializeObject(answer);
             System.out.println(serverResponse.getResponseBody() + " response body");
-            if (serverResponse.getResponseCode().equals(ResponseCode.ERROR))
-                AlertDisplay.showError(serverResponse.getResponseBody());
-            else AlertDisplay.showInfo(serverResponse.getResponseBody());
+            if (!serverResponse.getResponseBody().equals("Empty")) {
+                if (serverResponse.getResponseCode().equals(ResponseCode.ERROR))
+                    AlertDisplay.showError(serverResponse.getResponseBody());
+                else AlertDisplay.showInfo(serverResponse.getResponseBody());
+            }
             return serverResponse.getCollection();
         } catch (PortUnreachableException e) {
             AlertDisplay.showError("PortUnavailableError");
@@ -127,12 +129,12 @@ public class Client {
             serverResponse = (Response) new SerializationTool().deserializeObject(receiveAnswer());
             System.out.println(serverResponse.getResponseBody() + "response body " + serverResponse.getResponseCode().toString());
             if (serverResponse.getResponseCode().equals(ResponseCode.ERROR)) {
-//                if (!serverResponse.getResponseBody().equals("Empty"))
-                AlertDisplay.showError(serverResponse.getResponseBody());
+                if (!serverResponse.getResponseBody().equals("Empty"))
+                    AlertDisplay.showError(serverResponse.getResponseBody());
                 return false;
             } else {
-//                if (!serverResponse.getResponseBody().equals("Empty"))
-                AlertDisplay.showInfo(serverResponse.getResponseBody());
+                if (!serverResponse.getResponseBody().equals("Empty"))
+                    AlertDisplay.showInfo(serverResponse.getResponseBody());
                 this.user = user;
 //            userInterface.displayMessage("Вход успешен!");
                 return true;

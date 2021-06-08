@@ -214,8 +214,8 @@ public class MainWindowController {
         userColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getUsername()));
         localeMap = new HashMap<>();
         localeMap.put("Русский", new Locale("ru", "RU"));
-//        localeMap.put("Shqiptare", new Locale("sq", "AL"));
-//        localeMap.put("Slovák", new Locale("sk", "SK"));
+        localeMap.put("Shqiptare", new Locale("sq", "AL"));
+        localeMap.put("Slovák", new Locale("sk", "SK"));
         localeMap.put("English (Canada)", new Locale("en", "CA"));
         langChoiceComboBox.setItems(FXCollections.observableArrayList(localeMap.keySet()));
         shapeMap = new HashMap<>();

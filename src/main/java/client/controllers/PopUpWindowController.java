@@ -119,9 +119,9 @@ public class PopUpWindowController {
         annualTurnoverField.clear();
         streetField.clear();
         postalCodeField.clear();
-        positionComboBox.setPromptText("Choose position");
-        statusComboBox.setPromptText("Choose status");
-        orgTypeComboBox.setPromptText("Choose org. type");
+//        positionComboBox.setPromptText("Choose position");
+//        statusComboBox.setPromptText("Choose status");
+//        orgTypeComboBox.setPromptText("Choose org. type");
     }
 
     public Worker getResult() {
