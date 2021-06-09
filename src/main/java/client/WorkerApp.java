@@ -86,9 +86,11 @@ public class WorkerApp extends Application {
         client.setCollectionRefresher(client);
         client.setAlertDisplay();
         try {
-            if (client.connect(args[0], Integer.parseInt(args[1])))
+            if (client.connect(args[0], Integer.parseInt(args[1]))) {
+                client.setHost(args[0]);
+                client.setPort(Integer.parseInt(args[1]));
                 return true;
-            else return false;
+            } else return false;
         } catch (NumberFormatException e) {
             e.printStackTrace();
             return false;

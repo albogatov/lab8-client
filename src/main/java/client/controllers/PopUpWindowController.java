@@ -129,8 +129,10 @@ public class PopUpWindowController {
     }
 
     public Worker getResult() {
+        Worker worker = result;
+        result = null;
         clear();
-        return result;
+        return worker;
     }
 
     public void initialize() {

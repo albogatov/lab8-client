@@ -14,6 +14,7 @@ import commons.network.Response;
 import commons.network.ResponseCode;
 import commons.utils.UserInterface;
 import commons.utils.SerializationTool;
+import javafx.application.Platform;
 
 import java.io.*;
 import java.net.BindException;
@@ -38,6 +39,8 @@ public class Client {
     private User user = null;
     private CollectionRefresher collectionRefresher;
     private HashSet<Worker> collection;
+    private String host;
+    private int port;
     private AlertDisplay alertDisplay;
 
     public Client() throws IOException {
@@ -53,15 +56,6 @@ public class Client {
         userInterface.displayMessage("Осуществляется подключение по адресу " + host + " по порту " + port);
         return true;
     }
-
-//    public void sendCommand(Command cmd) throws IOException {
-//        if (SerializationTool.serializeObject(cmd) == null) {
-//            userInterface.displayMessage("Произошла ошибка сериализации");
-//            System.exit(-1);
-//        }
-//        ByteBuffer send = ByteBuffer.wrap(Objects.requireNonNull(SerializationTool.serializeObject(cmd)));
-//        datagramChannel.send(send, socketAddress);
-//    }
 
     public void sendRequest(Request request) throws IOException {
         ByteBuffer send = ByteBuffer.wrap(Objects.requireNonNull(SerializationTool.serializeObject(request)));
@@ -90,15 +84,23 @@ public class Client {
             selector.select();
             byte[] answer = receiveAnswer();
             serverResponse = (Response) new SerializationTool().deserializeObject(answer);
-            System.out.println(serverResponse.getResponseBody() + " response body");
             if (!serverResponse.getResponseBody().equals("Empty") || serverResponse.getResponseBody().equals("")) {
                 if (serverResponse.getResponseCode().equals(ResponseCode.ERROR))
-                    AlertDisplay.showError(serverResponse.getResponseBody());
-                else AlertDisplay.showInfo(serverResponse.getResponseBody());
+                    AlertDisplay.showError(serverResponse.getResponseBody(), serverResponse.getResponseBodyArgs());
+                else AlertDisplay.showInfo(serverResponse.getResponseBody(), serverResponse.getResponseBodyArgs());
             }
             return serverResponse.getCollection();
         } catch (PortUnreachableException e) {
             AlertDisplay.showError("PortUnavailableError");
+            try {
+                datagramChannel.disconnect();
+                connect(host, port);
+            } catch (PortUnreachableException ex) {
+                AlertDisplay.showError("TryLater");
+            } catch (IOException exc) {
+                AlertDisplay.showError("FatalConnectionError");
+                Platform.exit();
+            }
             return null;
         } catch (BindException e) {
             AlertDisplay.showError("ConnectionError");
@@ -167,14 +169,13 @@ public class Client {
             datagramChannel.register(selector, SelectionKey.OP_READ);
             selector.select();
             serverResponse = (Response) new SerializationTool().deserializeObject(receiveAnswer());
-            System.out.println(serverResponse.getResponseBody() + "response body " + serverResponse.getResponseCode().toString());
             if (serverResponse.getResponseCode().equals(ResponseCode.ERROR)) {
                 if (!serverResponse.getResponseBody().equals("Empty") || serverResponse.getResponseBody().equals(""))
-                    AlertDisplay.showError(serverResponse.getResponseBody());
+                    AlertDisplay.showError(serverResponse.getResponseBody(), serverResponse.getResponseBodyArgs());
                 return false;
             } else {
                 if (!serverResponse.getResponseBody().equals("Empty") || serverResponse.getResponseBody().equals(""))
-                    AlertDisplay.showInfo(serverResponse.getResponseBody());
+                    AlertDisplay.showInfo(serverResponse.getResponseBody(), serverResponse.getResponseBodyArgs());
                 this.user = user;
 //            userInterface.displayMessage("Вход успешен!");
                 return true;
@@ -204,14 +205,13 @@ public class Client {
             datagramChannel.register(selector, SelectionKey.OP_READ);
             selector.select();
             serverResponse = (Response) new SerializationTool().deserializeObject(receiveAnswer());
-            System.out.println(serverResponse.getResponseBody() + "response body " + serverResponse.getResponseCode().toString());
             if (serverResponse.getResponseCode().equals(ResponseCode.ERROR)) {
                 if (!serverResponse.getResponseBody().equals("Empty") || serverResponse.getResponseBody().equals(""))
-                    AlertDisplay.showError(serverResponse.getResponseBody());
+                    AlertDisplay.showError(serverResponse.getResponseBody(), serverResponse.getResponseBodyArgs());
                 return false;
             } else {
                 if (!serverResponse.getResponseBody().equals("Empty") || serverResponse.getResponseBody().equals(""))
-                    AlertDisplay.showInfo(serverResponse.getResponseBody());
+                    AlertDisplay.showInfo(serverResponse.getResponseBody(), serverResponse.getResponseBodyArgs());
                 this.user = user;
 //            userInterface.displayMessage("Вход успешен!");
                 return true;
@@ -261,5 +261,13 @@ public class Client {
 
     public int getPort() {
         return socketAddress.getPort();
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 }

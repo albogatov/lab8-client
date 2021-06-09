@@ -15,15 +15,18 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextBoundsType;
 import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -76,7 +79,7 @@ public class MainWindowController {
 
     private String REMOVE_BY_ID = "remove_by_id";
 
-    private String SAVE_TO_FILE = "save";
+//    private String SAVE_TO_FILE = "save";
 
     private String EXECUTE_SCRIPT = "execute_script";
 
@@ -176,8 +179,8 @@ public class MainWindowController {
     @FXML
     private Button printUniqueOrgsButton;
 
-    @FXML
-    private Button saveButton;
+//    @FXML
+//    private Button saveButton;
 
     @FXML
     private Button addIfMinButton;
@@ -343,10 +346,10 @@ public class MainWindowController {
         }
     }
 
-    @FXML
-    public void saveButtonOnClick() {
-        requestCommand(SAVE_TO_FILE);
-    }
+//    @FXML
+//    public void saveButtonOnClick() {
+//        requestCommand(SAVE_TO_FILE);
+//    }
 
     @FXML
     public void printUniqueOrgsButtonOnClick() {
@@ -397,16 +400,21 @@ public class MainWindowController {
             Shape circleObject = new Circle(size, userColorMap.get(worker.getUsername()));
 //            circleObject.setOnMouseClicked(this::shapeOnMouseClicked);
             Text infoText = new Text(worker.displayWorker());
+            Text textObject = new Text(String.valueOf(worker.getId()));
             circleObject.setOnMousePressed((event) -> {
                 switch (event.getClickCount()) {
                     case 1:
                         shapeOnMouseClicked(event);
+                        textObject.setVisible(false);
                         infoText.setVisible(true);
                         PauseTransition visiblePause = new PauseTransition(
                                 Duration.seconds(5)
                         );
                         visiblePause.setOnFinished(
-                                event1 -> infoText.setVisible(false)
+                                event1 -> {
+                                    infoText.setVisible(false);
+                                    textObject.setVisible(true);
+                                }
                         );
                         visiblePause.play();
                         break;
@@ -421,18 +429,25 @@ public class MainWindowController {
             circleObject.translateXProperty().bind(visualMapPane.widthProperty().divide(2).add(worker.getCoordinateX()));
             circleObject.translateYProperty().bind(visualMapPane.heightProperty().divide(2).subtract(worker.getCoordinateY()));
 
-            Text textObject = new Text(String.valueOf(worker.getId()));
             textObject.setOnMouseClicked(circleObject::fireEvent);
             textObject.setFont(Font.font(size / 3));
             textObject.setFill(userColorMap.get(worker.getUsername()).darker());
             textObject.translateXProperty().bind(circleObject.translateXProperty().subtract(textObject.getLayoutBounds().getWidth() / 2));
             textObject.translateYProperty().bind(circleObject.translateYProperty().add(textObject.getLayoutBounds().getHeight() / 4));
             infoText.setVisible(false);
+            infoText.setBoundsType(TextBoundsType.VISUAL);
 //            infoText.setOnMouseClicked(circleObject::fireEvent);
-            infoText.setFont(Font.font(size / 10));
+            infoText.setFont(Font.font(size / 8));
             infoText.setFill(userColorMap.get(worker.getUsername()).darker().darker().desaturate());
-            infoText.translateXProperty().bind(circleObject.translateXProperty().subtract(infoText.getLayoutBounds().getWidth() / 4));
-            infoText.translateYProperty().add(circleObject.translateYProperty().add(infoText.getLayoutBounds().getHeight() / 8));
+            infoText.translateXProperty().bind(circleObject.translateXProperty().subtract(textObject.getLayoutBounds().getWidth() / 2));
+            infoText.translateYProperty().bind(circleObject.translateYProperty().add(textObject.getLayoutBounds().getHeight() / 4));
+            StackPane layout = new StackPane();
+            layout.getChildren().addAll(
+                    infoText,
+                    textObject,
+                    circleObject
+            );
+            layout.setPadding(new Insets(20));
 
             visualMapPane.getChildren().add(circleObject);
             visualMapPane.getChildren().add(textObject);
@@ -495,6 +510,8 @@ public class MainWindowController {
             workerTableView.setItems(FXCollections.observableArrayList(result));
             workerTableView.getSelectionModel().clearSelection();
             visualise();
+        } else {
+            AlertDisplay.showError("ConnectionError");
         }
     }
 
@@ -543,7 +560,7 @@ public class MainWindowController {
         countByStatusButton.textProperty().bind(localizationTool.getStringBinding("CountByStatusButton"));
         printUniqueOrgsButton.textProperty().bind(localizationTool.getStringBinding("PrintUniqueOrgsButton"));
         addIfMinButton.textProperty().bind(localizationTool.getStringBinding("AddIfMinButton"));
-        saveButton.textProperty().bind(localizationTool.getStringBinding("SaveButton"));
+//        saveButton.textProperty().bind(localizationTool.getStringBinding("SaveButton"));
         executeScriptButton.textProperty().bind(localizationTool.getStringBinding("ExecuteScriptButton"));
         visualMapTab.textProperty().bind(localizationTool.getStringBinding("VisualMapTab"));
         dataTableTab.textProperty().bind(localizationTool.getStringBinding("DataTableTab"));

@@ -25,7 +25,7 @@
                                                 <TableColumn fx:id="idColumn" prefWidth="29.0" text="ID" />
                                                 <TableColumn fx:id="nameColumn" prefWidth="56.0" text="Name" />
                                                 <TableColumn prefWidth="23.0" text="X" fx:id="xColumn" />
-                                                <TableColumn fx:id="yColumn" prefWidth="18.0" text="Y" />
+                                                <TableColumn fx:id="yColumn" prefWidth="23.0" text="Y" />
                                                 <TableColumn fx:id="salaryColumn" prefWidth="53.0" text="Salary" />
                                                 <TableColumn fx:id="endDateColumn" prefWidth="69.0" text="End Date" />
                                                 <TableColumn fx:id="creationDateColumn" prefWidth="92.0" text="Creation Date" />
@@ -62,7 +62,6 @@
                         <Button fx:id="addIfMinButton" mnemonicParsing="false" onAction="#addIfMinButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="addIfMinButton" />
                         <Button fx:id="removeGreaterButton" mnemonicParsing="false" onAction="#removeGreaterButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="removeGreaterButton" />
                         <Button fx:id="removeLowerButton" mnemonicParsing="false" onAction="#removeLowerButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="removeLowerButton" />
-                        <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="saveButton" />
                         <Button fx:id="executeScriptButton" mnemonicParsing="false" onAction="#executeScriptButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="executeScriptButton" />
                         <Button fx:id="clearButton" mnemonicParsing="false" onAction="#clearButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="clearButton" />
                         <Button fx:id="helpButton" mnemonicParsing="false" onAction="#helpButtonOnClick" prefHeight="25.0" prefWidth="137.0" text="helpButton" />
