@@ -6,11 +6,14 @@ import client.controllers.PopUpWindowController;
 import client.utils.AlertDisplay;
 import client.utils.LocalizationTool;
 import commons.elements.Worker;
+import commons.network.Request;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import jdk.nashorn.internal.ir.RuntimeNode;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -77,7 +80,19 @@ public class WorkerApp extends Application {
         mainWindowController.setPopUpWindowController(popUpWindowController);
         primaryStage.setScene(mainWindowScene);
         primaryStage.setResizable(false);
-        mainWindowController.refreshButtonOnClick();
+        Thread update = new Thread(() -> {
+            try {
+                while (true) {
+                    client.processRequestFromUser("show", "", null);
+                    Platform.runLater(() -> mainWindowController.visualise());
+                    Thread.sleep(10000);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Platform.exit();
+            }
+        });
+        update.start();
         primaryStage.show();
     }
 

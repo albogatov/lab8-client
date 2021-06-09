@@ -386,7 +386,7 @@ public class MainWindowController {
         });
     }
 
-    private void visualise() {
+    public void visualise() {
         shapeMap.keySet().forEach(s -> visualMapPane.getChildren().remove(s));
         shapeMap.clear();
         textMap.values().forEach(s -> visualMapPane.getChildren().remove(s));
