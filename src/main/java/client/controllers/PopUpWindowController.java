@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
+import java.util.Locale;
 
 
 public class PopUpWindowController {
@@ -90,6 +91,7 @@ public class PopUpWindowController {
                     new Organization(parseAnnualTurnover(), orgTypeComboBox.getValue(), new Address(streetField.getText(),
                             postalCodeField.getText()), orgNameField.getText()), client.getUser().getLogin());
         } catch (IllegalArgumentException e) {
+            result = null;
             AlertDisplay.showError("WrongEnteredData");
         }
         displayStage.close();
@@ -120,6 +122,10 @@ public class PopUpWindowController {
         annualTurnoverField.clear();
         streetField.clear();
         postalCodeField.clear();
+        positionComboBox.valueProperty().set(null);
+        statusComboBox.valueProperty().set(null);
+        orgTypeComboBox.valueProperty().set(null);
+        endDatePicker.setValue(null);
     }
 
     public Worker getResult() {

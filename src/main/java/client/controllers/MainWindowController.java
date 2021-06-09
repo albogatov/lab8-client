@@ -7,6 +7,7 @@ import client.utils.CollectionRefresher;
 import client.utils.LocalizationTool;
 
 import commons.elements.*;
+import javafx.animation.PauseTransition;
 import javafx.animation.ScaleTransition;
 
 import javafx.application.Platform;
@@ -233,6 +234,7 @@ public class MainWindowController {
         fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File("."));
         getTable();
+        setTableAction();
     }
 
     public void getTable() {
@@ -241,6 +243,7 @@ public class MainWindowController {
 
     @FXML
     public void addButtonOnClick() {
+        localizePopUpWindow();
         popUpWindowController.clear();
         popUpStage.showAndWait();
         Worker worker = popUpWindowController.getResult();
@@ -250,6 +253,7 @@ public class MainWindowController {
 
     @FXML
     public void updateButtonOnClick() {
+        localizePopUpWindow();
         if (!workerTableView.getSelectionModel().isEmpty()) {
             popUpWindowController.prepareForUpdate(workerTableView.getSelectionModel().getSelectedItem());
             long id = workerTableView.getSelectionModel().getSelectedItem().getId();
@@ -294,6 +298,7 @@ public class MainWindowController {
 
     @FXML
     public void addIfMinButtonOnClick() {
+        localizePopUpWindow();
         popUpWindowController.clear();
         popUpStage.showAndWait();
         Worker worker = popUpWindowController.getResult();
@@ -333,7 +338,9 @@ public class MainWindowController {
 
     @FXML
     public void countByStatusButtonOnClick() {
-        requestCommand(COUNT_BY_STATUS);
+        if (!workerTableView.getSelectionModel().isEmpty()) {
+            requestCommand(COUNT_BY_STATUS, workerTableView.getSelectionModel().getSelectedItem().getStatusString());
+        }
     }
 
     @FXML
@@ -350,10 +357,30 @@ public class MainWindowController {
     public void refreshButtonOnClick() {
         try {
             requestCommand("show");
-            visualise();
+//            visualise();
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
+    }
+
+    private void setTableAction() {
+        workerTableView.setRowFactory(tv -> {
+            TableRow<Worker> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    Worker worker = row.getItem();
+                    if (worker.getUsername().equals(currentUserLabel.getText())) {
+                        popUpWindowController.prepareForUpdate(worker);
+                        long id = worker.getId();
+                        popUpStage.showAndWait();
+                        worker = popUpWindowController.getResult();
+                        if (worker != null)
+                            requestCommand(UPDATE, id + "", worker);
+                    }
+                }
+            });
+            return row;
+        });
     }
 
     private void visualise() {
@@ -367,9 +394,30 @@ public class MainWindowController {
                         Color.color(randomGenerator.nextDouble(), randomGenerator.nextDouble(), randomGenerator.nextDouble()));
 
             double size = Math.min(worker.getSalary(), 250);
-
             Shape circleObject = new Circle(size, userColorMap.get(worker.getUsername()));
-            circleObject.setOnMouseClicked(this::shapeOnMouseClicked);
+//            circleObject.setOnMouseClicked(this::shapeOnMouseClicked);
+            Text infoText = new Text(worker.displayWorker());
+            circleObject.setOnMousePressed((event) -> {
+                switch (event.getClickCount()) {
+                    case 1:
+                        shapeOnMouseClicked(event);
+                        infoText.setVisible(true);
+                        PauseTransition visiblePause = new PauseTransition(
+                                Duration.seconds(5)
+                        );
+                        visiblePause.setOnFinished(
+                                event1 -> infoText.setVisible(false)
+                        );
+                        visiblePause.play();
+                        break;
+                    case 2:
+                        shapeOnMouseClicked(event);
+                        updateButtonOnClick();
+                        break;
+                    default:
+                        break;
+                }
+            });
             circleObject.translateXProperty().bind(visualMapPane.widthProperty().divide(2).add(worker.getCoordinateX()));
             circleObject.translateYProperty().bind(visualMapPane.heightProperty().divide(2).subtract(worker.getCoordinateY()));
 
@@ -379,9 +427,17 @@ public class MainWindowController {
             textObject.setFill(userColorMap.get(worker.getUsername()).darker());
             textObject.translateXProperty().bind(circleObject.translateXProperty().subtract(textObject.getLayoutBounds().getWidth() / 2));
             textObject.translateYProperty().bind(circleObject.translateYProperty().add(textObject.getLayoutBounds().getHeight() / 4));
+            infoText.setVisible(false);
+//            infoText.setOnMouseClicked(circleObject::fireEvent);
+            infoText.setFont(Font.font(size / 10));
+            infoText.setFill(userColorMap.get(worker.getUsername()).darker().darker().desaturate());
+            infoText.translateXProperty().bind(circleObject.translateXProperty().subtract(infoText.getLayoutBounds().getWidth() / 4));
+            infoText.translateYProperty().add(circleObject.translateYProperty().add(infoText.getLayoutBounds().getHeight() / 8));
 
             visualMapPane.getChildren().add(circleObject);
             visualMapPane.getChildren().add(textObject);
+            visualMapPane.getChildren().add(infoText);
+
             shapeMap.put(circleObject, worker.getId());
             textMap.put(worker.getId(), textObject);
 
@@ -514,5 +570,11 @@ public class MainWindowController {
 
     public void setPrimaryStage(Stage stage) {
         this.primaryStage = stage;
+    }
+
+    public void localizePopUpWindow() {
+        String lang;
+        lang = langChoiceComboBox.getSelectionModel().getSelectedItem();
+        Locale.setDefault(localeMap.get(lang));
     }
 }
