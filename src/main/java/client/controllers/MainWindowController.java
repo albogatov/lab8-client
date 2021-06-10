@@ -542,7 +542,7 @@ public class MainWindowController {
             workerTableView.getSelectionModel().clearSelection();
             visualise();
         } else {
-            AlertDisplay.showError("ConnectionError");
+            return;
         }
     }
 

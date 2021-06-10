@@ -51,8 +51,8 @@ public class WorkerApp extends Application {
     }
 
     public void startMainWindow() throws IOException {
-        client.initCollection();
-        HashSet<Worker> workers = client.getCollection();
+//        client.initCollection();
+        HashSet<Worker> workers = new HashSet<>();
 
         FXMLLoader mainWindowLoader = new FXMLLoader(WorkerApp.class.getResource("/mainWindow.fxml"));
         Parent mainWindowRootNode = mainWindowLoader.load();
@@ -83,9 +83,13 @@ public class WorkerApp extends Application {
         Thread update = new Thread(() -> {
             try {
                 while (true) {
-                    client.processRequestFromUser("show", "", null);
-                    Platform.runLater(() -> mainWindowController.visualise());
-                    Thread.sleep(60000);
+                    HashSet<Worker> updated = client.processRequestFromUser("show", "", null);
+                    if (updated != null) {
+                        mainWindowController.setData(updated);
+                        mainWindowController.getTable();
+                        Platform.runLater(() -> mainWindowController.visualise());
+                    }
+                    Thread.sleep(15000);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();

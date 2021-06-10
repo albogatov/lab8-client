@@ -83,10 +83,13 @@ public class Client {
             selector.select();
             byte[] answer = receiveAnswer();
             serverResponse = (Response) new SerializationTool().deserializeObject(answer);
-            if (!serverResponse.getResponseBody().equals("Empty") || serverResponse.getResponseBody().equals("")) {
+            if (!serverResponse.getResponseBody().equals("NotNeeded") && (!serverResponse.getResponseBody().equals("Empty") || serverResponse.getResponseBody().equals(""))) {
                 if (serverResponse.getResponseCode().equals(ResponseCode.ERROR))
                     AlertDisplay.showError(serverResponse.getResponseBody(), serverResponse.getResponseBodyArgs());
                 else AlertDisplay.showInfo(serverResponse.getResponseBody(), serverResponse.getResponseBodyArgs());
+            }
+            if (serverResponse.getResponseBody().equals("NotNeeded")) {
+                return null;
             }
             return serverResponse.getCollection();
         } catch (PortUnreachableException e) {
