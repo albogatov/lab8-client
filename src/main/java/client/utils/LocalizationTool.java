@@ -4,32 +4,25 @@ import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import java.util.Enumeration;
 import java.util.ResourceBundle;
 
 public class LocalizationTool {
-    private ObjectProperty<ResourceBundle> resources = new SimpleObjectProperty<>();
+    private ResourceBundle resources = null;
 
-    public ObjectProperty<ResourceBundle> getBundle() {
+    public ResourceBundle getBundle() {
         return resources;
     }
 
     public final ResourceBundle getResources() {
-        return getBundle().get();
+        return getBundle();
     }
 
     public final void setResources(ResourceBundle resources) {
-        getBundle().set(resources);
+        this.resources = resources;
     }
 
-    public StringBinding getStringBinding(String key) {
-        return new StringBinding() {
-            {
-                bind(getBundle());
-            }
-            @Override
-            public String computeValue() {
-                return getResources().getString(key);
-            }
-        };
+    public String getStringBinding(String key) {
+        return resources.getString(key);
     }
 }

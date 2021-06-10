@@ -6,14 +6,12 @@ import client.controllers.PopUpWindowController;
 import client.utils.AlertDisplay;
 import client.utils.LocalizationTool;
 import commons.elements.Worker;
-import commons.network.Request;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import jdk.nashorn.internal.ir.RuntimeNode;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -29,7 +27,7 @@ public class WorkerApp extends Application {
 
     public static void main(String[] args) throws IOException {
         localizationTool = new LocalizationTool();
-        localizationTool.setResources(ResourceBundle.getBundle("bundles.ui"));
+        localizationTool.setResources(ResourceBundle.getBundle("client.bundles.gui"));
         AlertDisplay.setLocalizationTool(localizationTool);
         if (initializeClient(args))
             launch(args);
@@ -47,6 +45,7 @@ public class WorkerApp extends Application {
         authWindowController.setClient(client);
         authWindowController.initLangs(localizationTool);
         primaryStage.setScene(authWindowScene);
+        primaryStage.setTitle("Worker App");
         primaryStage.setResizable(false);
         primaryStage.show();
     }
@@ -66,7 +65,7 @@ public class WorkerApp extends Application {
         mainWindowController.init();
         mainWindowController.setResources(localizationTool);
 
-        FXMLLoader popUpWindowLoader = new FXMLLoader(WorkerApp.class.getResource("/popUpWindow.fxml"));
+        FXMLLoader popUpWindowLoader = new FXMLLoader(WorkerApp.class.getResource("/PopUpWindow.fxml"));
         Parent popUpWindowRootNode = popUpWindowLoader.load();
         Scene popUpWindowScene = new Scene(popUpWindowRootNode);
         Stage popUpStage = new Stage();
@@ -76,6 +75,7 @@ public class WorkerApp extends Application {
         popUpWindowController.setDisplayStage(popUpStage);
         popUpWindowController.initLangs(localizationTool);
         popUpStage.setResizable(false);
+        popUpStage.setTitle("Worker App");
 
         mainWindowController.setPopUpWindowController(popUpWindowController);
         primaryStage.setScene(mainWindowScene);
@@ -85,7 +85,7 @@ public class WorkerApp extends Application {
                 while (true) {
                     client.processRequestFromUser("show", "", null);
                     Platform.runLater(() -> mainWindowController.visualise());
-                    Thread.sleep(10000);
+                    Thread.sleep(60000);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -111,4 +111,10 @@ public class WorkerApp extends Application {
             return false;
         }
     }
+
+    @Override
+    public void stop() {
+        System.exit(0);
+    }
+
 }

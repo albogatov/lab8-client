@@ -67,10 +67,10 @@ public class AuthWindowController {
 
     public void initLangs(LocalizationTool localizationTool) {
         this.localizationTool = localizationTool;
-        loginLabel.textProperty().bind(localizationTool.getStringBinding("LoginLabel"));
-        loginField.promptTextProperty().bind(localizationTool.getStringBinding("LoginFieldText"));
-        pwdField.promptTextProperty().bind(localizationTool.getStringBinding("PwdFieldText"));
-        loginButton.textProperty().bind(localizationTool.getStringBinding("LoginButton"));
-        registerButton.textProperty().bind(localizationTool.getStringBinding("RegisterButton"));
+        loginLabel.setText(localizationTool.getStringBinding("LoginLabel"));
+        loginField.setPromptText(localizationTool.getStringBinding("LoginFieldText"));
+        pwdField.setPromptText(localizationTool.getStringBinding("PwdFieldText"));
+        loginButton.setText(localizationTool.getStringBinding("LoginButton"));
+        registerButton.setText(localizationTool.getStringBinding("RegisterButton"));
     }
 }

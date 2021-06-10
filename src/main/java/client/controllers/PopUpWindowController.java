@@ -143,31 +143,31 @@ public class PopUpWindowController {
 
     public void initLangs(LocalizationTool localizationTool) {
         this.localizationTool = localizationTool;
-        nameLabel.textProperty().bind(localizationTool.getStringBinding("NameLabel"));
-        xLabel.textProperty().bind(localizationTool.getStringBinding("XLabel"));
-        yLabel.textProperty().bind(localizationTool.getStringBinding("YLabel"));
-        salaryLabel.textProperty().bind(localizationTool.getStringBinding("SalaryLabel"));
-        endDateLabel.textProperty().bind(localizationTool.getStringBinding("EndDateLabel"));
-        positionLabel.textProperty().bind(localizationTool.getStringBinding("PositionLabel"));
-        statusLabel.textProperty().bind(localizationTool.getStringBinding("StatusLabel"));
-        orgLabel.textProperty().bind(localizationTool.getStringBinding("OrgLabel"));
-        orgTypeLabel.textProperty().bind(localizationTool.getStringBinding("OrgTypeLabel"));
-        annTurnoverLabel.textProperty().bind(localizationTool.getStringBinding("AnnTurnoverLabel"));
-        streetLabel.textProperty().bind(localizationTool.getStringBinding("StreetLabel"));
-        postalCodeLabel.textProperty().bind(localizationTool.getStringBinding("PostalCodeLabel"));
-        doneButton.textProperty().bind(localizationTool.getStringBinding("DoneButton"));
-        nameField.promptTextProperty().bind(localizationTool.getStringBinding("NamePrompt"));
-        xField.promptTextProperty().bind(localizationTool.getStringBinding("XPrompt"));
-        yField.promptTextProperty().bind(localizationTool.getStringBinding("YPrompt"));
-        salaryField.promptTextProperty().bind(localizationTool.getStringBinding("SalaryPrompt"));
-        endDatePicker.promptTextProperty().bind(localizationTool.getStringBinding("EndDatePrompt"));
-        positionComboBox.promptTextProperty().bind(localizationTool.getStringBinding("PositionPrompt"));
-        statusComboBox.promptTextProperty().bind(localizationTool.getStringBinding("StatusPrompt"));
-        orgNameField.promptTextProperty().bind(localizationTool.getStringBinding("OrgPrompt"));
-        orgTypeComboBox.promptTextProperty().bind(localizationTool.getStringBinding("OrgTypePrompt"));
-        annualTurnoverField.promptTextProperty().bind(localizationTool.getStringBinding("AnnTurnoverPrompt"));
-        streetField.promptTextProperty().bind(localizationTool.getStringBinding("StreetPrompt"));
-        postalCodeField.promptTextProperty().bind(localizationTool.getStringBinding("PostalCodePrompt"));
+        nameLabel.setText(localizationTool.getStringBinding("NameLabel"));
+        xLabel.setText(localizationTool.getStringBinding("XLabel"));
+        yLabel.setText(localizationTool.getStringBinding("YLabel"));
+        salaryLabel.setText(localizationTool.getStringBinding("SalaryLabel"));
+        endDateLabel.setText(localizationTool.getStringBinding("EndDateLabel"));
+        positionLabel.setText(localizationTool.getStringBinding("PositionLabel"));
+        statusLabel.setText(localizationTool.getStringBinding("StatusLabel"));
+        orgLabel.setText(localizationTool.getStringBinding("OrgLabel"));
+        orgTypeLabel.setText(localizationTool.getStringBinding("OrgTypeLabel"));
+        annTurnoverLabel.setText(localizationTool.getStringBinding("AnnTurnoverLabel"));
+        streetLabel.setText(localizationTool.getStringBinding("StreetLabel"));
+        postalCodeLabel.setText(localizationTool.getStringBinding("PostalCodeLabel"));
+        doneButton.setText(localizationTool.getStringBinding("DoneButton"));
+        nameField.setPromptText(localizationTool.getStringBinding("NamePrompt"));
+        xField.setPromptText(localizationTool.getStringBinding("XPrompt"));
+        yField.setPromptText(localizationTool.getStringBinding("YPrompt"));
+        salaryField.setPromptText(localizationTool.getStringBinding("SalaryPrompt"));
+        endDatePicker.setPromptText(localizationTool.getStringBinding("EndDatePrompt"));
+        positionComboBox.setPromptText(localizationTool.getStringBinding("PositionPrompt"));
+        statusComboBox.setPromptText(localizationTool.getStringBinding("StatusPrompt"));
+        orgNameField.setPromptText(localizationTool.getStringBinding("OrgPrompt"));
+        orgTypeComboBox.setPromptText(localizationTool.getStringBinding("OrgTypePrompt"));
+        annualTurnoverField.setPromptText(localizationTool.getStringBinding("AnnTurnoverPrompt"));
+        streetField.setPromptText(localizationTool.getStringBinding("StreetPrompt"));
+        postalCodeField.setPromptText(localizationTool.getStringBinding("PostalCodePrompt"));
     }
 
     public void setClient(Client client) {

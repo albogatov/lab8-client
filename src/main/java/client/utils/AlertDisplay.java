@@ -36,7 +36,7 @@ public class AlertDisplay {
     private static String localize(String str, String[] args) {
         try {
             if (args == null) return localizationTool.getResources().getString(str);
-            if(!str.contains("Info")) {
+            if (!str.contains("Info")) {
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append(localizationTool.getResources().getString(str));
                 for (int i = 0; i < args.length; i++) {
@@ -48,6 +48,17 @@ public class AlertDisplay {
                 return messageFormat.format(args);
             }
         } catch (MissingResourceException | NullPointerException exception) {
+            return str;
+        }
+    }
+
+    public static String localizeNoMessage(String str, String[] args) {
+        try {
+            if (args == null) return localizationTool.getResources().getString(str);
+            MessageFormat messageFormat = new MessageFormat(localizationTool.getResources().getString(str));
+            return messageFormat.format(args);
+        } catch (MissingResourceException | NullPointerException exception) {
+            exception.printStackTrace();
             return str;
         }
     }

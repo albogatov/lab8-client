@@ -3,7 +3,6 @@ package client;
 import client.utils.AlertDisplay;
 import client.utils.CollectionRefresher;
 import client.utils.ScriptExecutor;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import commons.app.*;
 import commons.commands.Login;
 import commons.commands.Register;

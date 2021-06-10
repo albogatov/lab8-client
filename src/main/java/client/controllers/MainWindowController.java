@@ -7,6 +7,7 @@ import client.utils.CollectionRefresher;
 import client.utils.LocalizationTool;
 
 import commons.elements.*;
+import javafx.animation.PathTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.ScaleTransition;
 
@@ -16,14 +17,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Shape;
+import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextBoundsType;
@@ -54,6 +55,8 @@ public class MainWindowController {
     private Map<Shape, Long> shapeMap;
 
     private Map<Long, Text> textMap;
+
+    private Map<Long, Text> infoTextMap;
 
     private Map<String, Locale> localeMap;
 
@@ -232,12 +235,21 @@ public class MainWindowController {
         langChoiceComboBox.setItems(FXCollections.observableArrayList(localeMap.keySet()));
         shapeMap = new HashMap<>();
         textMap = new HashMap<>();
+        infoTextMap = new HashMap<>();
         userColorMap = new HashMap<>();
         randomGenerator = new Random();
         fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File("."));
         getTable();
         setTableAction();
+        langChoiceComboBox.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+                    localizationTool.setResources(ResourceBundle.getBundle("client.bundles.gui", localeMap.get(newValue)));
+                    bindLanguage();
+                    if (popUpWindowController != null)
+                        popUpWindowController.initLangs(localizationTool);
+                    AlertDisplay.setLocalizationTool(localizationTool);
+                }
+        );
     }
 
     public void getTable() {
@@ -343,6 +355,8 @@ public class MainWindowController {
     public void countByStatusButtonOnClick() {
         if (!workerTableView.getSelectionModel().isEmpty()) {
             requestCommand(COUNT_BY_STATUS, workerTableView.getSelectionModel().getSelectedItem().getStatusString());
+        } else {
+            AlertDisplay.showError("ObjectNotChosen");
         }
     }
 
@@ -391,7 +405,11 @@ public class MainWindowController {
         shapeMap.clear();
         textMap.values().forEach(s -> visualMapPane.getChildren().remove(s));
         textMap.clear();
+        infoTextMap.values().forEach(s -> visualMapPane.getChildren().remove(s));
+        infoTextMap.clear();
         for (Worker worker : workerTableView.getItems()) {
+            Text infoText = new Text(AlertDisplay.localizeNoMessage("WorkerDisplay", worker.displayWorker().split("\n")));
+            infoText.setVisible(false);
             if (!userColorMap.containsKey(worker.getUsername()))
                 userColorMap.put(worker.getUsername(),
                         Color.color(randomGenerator.nextDouble(), randomGenerator.nextDouble(), randomGenerator.nextDouble()));
@@ -399,7 +417,6 @@ public class MainWindowController {
             double size = Math.min(worker.getSalary(), 250);
             Shape circleObject = new Circle(size, userColorMap.get(worker.getUsername()));
 //            circleObject.setOnMouseClicked(this::shapeOnMouseClicked);
-            Text infoText = new Text(worker.displayWorker());
             Text textObject = new Text(String.valueOf(worker.getId()));
             circleObject.setOnMousePressed((event) -> {
                 switch (event.getClickCount()) {
@@ -426,8 +443,8 @@ public class MainWindowController {
                         break;
                 }
             });
-            circleObject.translateXProperty().bind(visualMapPane.widthProperty().divide(2).add(worker.getCoordinateX()));
-            circleObject.translateYProperty().bind(visualMapPane.heightProperty().divide(2).subtract(worker.getCoordinateY()));
+//            circleObject.translateXProperty().bind(visualMapPane.widthProperty().divide(2).add(worker.getCoordinateX()));
+//            circleObject.translateYProperty().bind(visualMapPane.heightProperty().divide(2).subtract(worker.getCoordinateY()));
 
             textObject.setOnMouseClicked(circleObject::fireEvent);
             textObject.setFont(Font.font(size / 3));
@@ -439,8 +456,8 @@ public class MainWindowController {
 //            infoText.setOnMouseClicked(circleObject::fireEvent);
             infoText.setFont(Font.font(size / 8));
             infoText.setFill(userColorMap.get(worker.getUsername()).darker().darker().desaturate());
-            infoText.translateXProperty().bind(circleObject.translateXProperty().subtract(textObject.getLayoutBounds().getWidth() / 2));
-            infoText.translateYProperty().bind(circleObject.translateYProperty().add(textObject.getLayoutBounds().getHeight() / 4));
+            infoText.translateXProperty().bind(circleObject.translateXProperty().add(-50));
+            infoText.translateYProperty().bind(circleObject.translateYProperty().subtract(100));
             StackPane layout = new StackPane();
             layout.getChildren().addAll(
                     infoText,
@@ -448,6 +465,7 @@ public class MainWindowController {
                     circleObject
             );
             layout.setPadding(new Insets(20));
+            layout.setAlignment(Pos.TOP_CENTER);
 
             visualMapPane.getChildren().add(circleObject);
             visualMapPane.getChildren().add(textObject);
@@ -455,19 +473,32 @@ public class MainWindowController {
 
             shapeMap.put(circleObject, worker.getId());
             textMap.put(worker.getId(), textObject);
+            infoTextMap.put(worker.getId(), infoText);
 
-            ScaleTransition circleAnimation = new ScaleTransition(Duration.millis(1000), circleObject);
-            ScaleTransition textAnimation = new ScaleTransition(Duration.millis(1000), textObject);
-            circleAnimation.setFromX(0);
-            circleAnimation.setToX(1);
-            circleAnimation.setFromY(0);
-            circleAnimation.setToY(1);
-            textAnimation.setFromX(0);
-            textAnimation.setToX(1);
-            textAnimation.setFromY(0);
-            textAnimation.setToY(1);
-            circleAnimation.play();
-            textAnimation.play();
+            Path path = new Path();
+            path.getElements().add(new MoveTo(0, -500));
+            path.getElements().add(new HLineTo(worker.getCoordinateX()));
+            path.getElements().add(new VLineTo(worker.getCoordinateY()));
+
+            PathTransition pathTransition = new PathTransition();
+            pathTransition.setDuration(Duration.millis(1500));
+            pathTransition.setNode(circleObject);
+            pathTransition.setPath(path);
+            pathTransition.setOrientation(PathTransition.OrientationType.NONE);
+            pathTransition.setAutoReverse(false);
+            pathTransition.play();
+//            ScaleTransition circleAnimation = new ScaleTransition(Duration.millis(1000), circleObject);
+//            ScaleTransition textAnimation = new ScaleTransition(Duration.millis(1000), textObject);
+//            circleAnimation.setFromX(0);
+//            circleAnimation.setToX(1);
+//            circleAnimation.setFromY(0);
+//            circleAnimation.setToY(1);
+//            textAnimation.setFromX(0);
+//            textAnimation.setToX(1);
+//            textAnimation.setFromY(0);
+//            textAnimation.setToY(1);
+//            circleAnimation.play();
+//            textAnimation.play();
         }
     }
 
@@ -524,46 +555,46 @@ public class MainWindowController {
         if (langChoiceComboBox.getSelectionModel().getSelectedItem().isEmpty())
             langChoiceComboBox.getSelectionModel().selectFirst();
         langChoiceComboBox.setOnAction((action) -> {
-            localizationTool.setResources(ResourceBundle.getBundle("bundles.ui",
+            localizationTool.setResources(ResourceBundle.getBundle("client.bundles.gui",
                     localeMap.get(langChoiceComboBox.getValue())));
         });
         bindLanguage();
     }
 
     public void bindLanguage() {
-        localizationTool.setResources(ResourceBundle.getBundle("bundles.ui",
+        localizationTool.setResources(ResourceBundle.getBundle("client.bundles.gui",
                 localeMap.get(langChoiceComboBox.getSelectionModel().getSelectedItem())));
-        idColumn.textProperty().bind(localizationTool.getStringBinding("IdColumn"));
-        nameColumn.textProperty().bind(localizationTool.getStringBinding("NameColumn"));
-        xColumn.textProperty().bind(localizationTool.getStringBinding("XColumn"));
-        yColumn.textProperty().bind(localizationTool.getStringBinding("YColumn"));
-        salaryColumn.textProperty().bind(localizationTool.getStringBinding("SalaryColumn"));
-        endDateColumn.textProperty().bind(localizationTool.getStringBinding("EndDateColumn"));
-        creationDateColumn.textProperty().bind(localizationTool.getStringBinding("CreationDateColumn"));
-        positionColumn.textProperty().bind(localizationTool.getStringBinding("PositionColumn"));
-        statusColumn.textProperty().bind(localizationTool.getStringBinding("StatusColumn"));
-        orgColumn.textProperty().bind(localizationTool.getStringBinding("OrgColumn"));
-        orgTypeColumn.textProperty().bind(localizationTool.getStringBinding("OrgTypeColumn"));
-        annualTurnoverColumn.textProperty().bind(localizationTool.getStringBinding("AnnualTurnoverColumn"));
-        streetColumn.textProperty().bind(localizationTool.getStringBinding("StreetColumn"));
-        postalCodeColumn.textProperty().bind(localizationTool.getStringBinding("PostalCodeColumn"));
-        userColumn.textProperty().bind(localizationTool.getStringBinding("UserColumn"));
-        refreshButton.textProperty().bind(localizationTool.getStringBinding("RefreshButton"));
-        addButton.textProperty().bind(localizationTool.getStringBinding("AddButton"));
-        updateButton.textProperty().bind(localizationTool.getStringBinding("UpdateButton"));
-        removeButton.textProperty().bind(localizationTool.getStringBinding("RemoveButton"));
-        removeGreaterButton.textProperty().bind(localizationTool.getStringBinding("RemoveGreaterButton"));
-        removeLowerButton.textProperty().bind(localizationTool.getStringBinding("RemoveLowerButton"));
-        clearButton.textProperty().bind(localizationTool.getStringBinding("ClearButton"));
-        helpButton.textProperty().bind(localizationTool.getStringBinding("HelpButton"));
-        infoButton.textProperty().bind(localizationTool.getStringBinding("InfoButton"));
-        countByStatusButton.textProperty().bind(localizationTool.getStringBinding("CountByStatusButton"));
-        printUniqueOrgsButton.textProperty().bind(localizationTool.getStringBinding("PrintUniqueOrgsButton"));
-        addIfMinButton.textProperty().bind(localizationTool.getStringBinding("AddIfMinButton"));
+        idColumn.setText(localizationTool.getStringBinding("IdColumn"));
+        nameColumn.setText(localizationTool.getStringBinding("NameColumn"));
+        xColumn.setText(localizationTool.getStringBinding("XColumn"));
+        yColumn.setText(localizationTool.getStringBinding("YColumn"));
+        salaryColumn.setText(localizationTool.getStringBinding("SalaryColumn"));
+        endDateColumn.setText(localizationTool.getStringBinding("EndDateColumn"));
+        creationDateColumn.setText(localizationTool.getStringBinding("CreationDateColumn"));
+        positionColumn.setText(localizationTool.getStringBinding("PositionColumn"));
+        statusColumn.setText(localizationTool.getStringBinding("StatusColumn"));
+        orgColumn.setText(localizationTool.getStringBinding("OrgColumn"));
+        orgTypeColumn.setText(localizationTool.getStringBinding("OrgTypeColumn"));
+        annualTurnoverColumn.setText(localizationTool.getStringBinding("AnnualTurnoverColumn"));
+        streetColumn.setText(localizationTool.getStringBinding("StreetColumn"));
+        postalCodeColumn.setText(localizationTool.getStringBinding("PostalCodeColumn"));
+        userColumn.setText(localizationTool.getStringBinding("UserColumn"));
+        refreshButton.setText(localizationTool.getStringBinding("RefreshButton"));
+        addButton.setText(localizationTool.getStringBinding("AddButton"));
+        updateButton.setText(localizationTool.getStringBinding("UpdateButton"));
+        removeButton.setText(localizationTool.getStringBinding("RemoveButton"));
+        removeGreaterButton.setText(localizationTool.getStringBinding("RemoveGreaterButton"));
+        removeLowerButton.setText(localizationTool.getStringBinding("RemoveLowerButton"));
+        clearButton.setText(localizationTool.getStringBinding("ClearButton"));
+        helpButton.setText(localizationTool.getStringBinding("HelpButton"));
+        infoButton.setText(localizationTool.getStringBinding("InfoButton"));
+        countByStatusButton.setText(localizationTool.getStringBinding("CountByStatusButton"));
+        printUniqueOrgsButton.setText(localizationTool.getStringBinding("PrintUniqueOrgsButton"));
+        addIfMinButton.setText(localizationTool.getStringBinding("AddIfMinButton"));
 //        saveButton.textProperty().bind(localizationTool.getStringBinding("SaveButton"));
-        executeScriptButton.textProperty().bind(localizationTool.getStringBinding("ExecuteScriptButton"));
-        visualMapTab.textProperty().bind(localizationTool.getStringBinding("VisualMapTab"));
-        dataTableTab.textProperty().bind(localizationTool.getStringBinding("DataTableTab"));
+        executeScriptButton.setText(localizationTool.getStringBinding("ExecuteScriptButton"));
+        visualMapTab.setText(localizationTool.getStringBinding("VisualMapTab"));
+        dataTableTab.setText(localizationTool.getStringBinding("DataTableTab"));
     }
 
     public void setClient(Client client) {
